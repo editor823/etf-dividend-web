@@ -28,6 +28,7 @@ import DividendCalendar from '@/components/calculator/DividendCalendar';
 import SavePortfolioModal from '@/components/auth/SavePortfolioModal';
 import AdminDashboardModal from '@/components/admin/AdminDashboardModal';
 import Footer from '@/components/layout/Footer';
+import AdBannerSlot from '@/components/ads/AdBannerSlot';
 
 export default function Home() {
   const { user, signOut } = useAuth();
@@ -389,6 +390,9 @@ export default function Home() {
           </div>
         </section>
 
+        {/* 메인 계산기 하단 광고 슬롯 */}
+        <AdBannerSlot slotId="home-calculator-bottom-slot" className="my-8" />
+
         {/* 6대 핵심 기능 로드맵 그리드 */}
         <div className="pt-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
@@ -537,6 +541,9 @@ export default function Home() {
             </Link>
           </div>
         </section>
+
+        {/* 메인 하단 광고 슬롯 */}
+        <AdBannerSlot slotId="home-footer-top-slot" className="my-8" />
       </main>
 
       {/* 포트폴리오 저장 모달 팝업 */}

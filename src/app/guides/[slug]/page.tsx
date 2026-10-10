@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { GUIDE_POSTS } from '@/lib/data/guides-data';
 import Footer from '@/components/layout/Footer';
+import AdBannerSlot from '@/components/ads/AdBannerSlot';
 import type { Metadata } from 'next';
 
 interface Props {
@@ -158,6 +159,9 @@ export default function GuideDetailPage({ params }: Props) {
           </ul>
         </div>
 
+        {/* 상단 광고 슬롯 */}
+        <AdBannerSlot slotId="guide-top-slot" className="my-6" />
+
         {/* 본문 텍스트 (Typography 최적화) */}
         <article className="prose prose-neutral max-w-none text-brand-primary/90 text-sm sm:text-base leading-relaxed space-y-6">
           {post.content.split('\n\n').map((paragraph, index) => {
@@ -275,6 +279,9 @@ export default function GuideDetailPage({ params }: Props) {
             );
           })}
         </article>
+
+        {/* 하단 광고 슬롯 */}
+        <AdBannerSlot slotId="guide-bottom-slot" className="my-8" />
 
         {/* 아티클 하단 CTA */}
         <div className="pt-10 border-t border-subtle-border flex flex-col sm:flex-row items-center justify-between gap-4 bg-white p-6 rounded-2xl shadow-card border border-subtle-border">
