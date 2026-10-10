@@ -27,6 +27,7 @@ import DripSimulator from '@/components/calculator/DripSimulator';
 import DividendCalendar from '@/components/calculator/DividendCalendar';
 import SavePortfolioModal from '@/components/auth/SavePortfolioModal';
 import AdminDashboardModal from '@/components/admin/AdminDashboardModal';
+import Footer from '@/components/layout/Footer';
 
 export default function Home() {
   const { user, signOut } = useAuth();
@@ -545,25 +546,8 @@ export default function Home() {
         currentHoldings={currentHoldingsToSave}
       />
 
-      {/* 하단 푸터 */}
-      <footer className="border-t border-subtle-border bg-white mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-brand-muted">
-          <p>© 2026 Dividend Intelligence Platform. All rights reserved.</p>
-          <div className="flex items-center gap-4">
-            <Link href="/guides" className="hover:underline">
-              투자 가이드
-            </Link>
-            <button
-              onClick={() => setIsAdminModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg hover:bg-brand-secondary text-brand-muted hover:text-brand-primary transition-colors cursor-pointer"
-              title="관리자 전용 시스템 모드"
-            >
-              <Lock className="w-3.5 h-3.5" />
-              <span>관리자 모드</span>
-            </button>
-          </div>
-        </div>
-      </footer>
+      {/* 글로벌 푸터 */}
+      <Footer onOpenAdminModal={() => setIsAdminModalOpen(true)} />
 
       {/* 관리자 모드 모달 */}
       <AdminDashboardModal

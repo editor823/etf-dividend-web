@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { BookOpen, Clock, ArrowRight, TrendingUp, Sparkles, Home } from 'lucide-react';
 import { GUIDE_POSTS } from '@/lib/data/guides-data';
+import Footer from '@/components/layout/Footer';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -103,15 +104,8 @@ export default function GuidesIndexPage() {
         </div>
       </main>
 
-      {/* 푸터 */}
-      <footer className="border-t border-subtle-border bg-white mt-16 py-8">
-        <div className="max-w-5xl mx-auto px-4 text-center text-xs text-brand-muted space-y-2">
-          <p>© 2026 Dividend Intelligence Platform. All rights reserved.</p>
-          <p className="text-[11px] text-brand-muted/70">
-            본 콘텐츠는 정보 제공 목적으로 작성되었으며, 특정 금융 상품에 대한 매수 또는 매도 권유가 아닙니다.
-          </p>
-        </div>
-      </footer>
+      {/* 글로벌 푸터 */}
+      <Footer />
     </div>
   );
 }

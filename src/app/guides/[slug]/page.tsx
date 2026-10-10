@@ -9,6 +9,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { GUIDE_POSTS } from '@/lib/data/guides-data';
+import Footer from '@/components/layout/Footer';
 import type { Metadata } from 'next';
 
 interface Props {
@@ -294,20 +295,8 @@ export default function GuideDetailPage({ params }: Props) {
         </div>
       </main>
 
-      {/* 푸터 */}
-      <footer className="border-t border-subtle-border bg-white mt-16 py-8">
-        <div className="max-w-4xl mx-auto px-4 text-center text-xs text-brand-muted space-y-2">
-          <p>© 2026 Dividend Intelligence Platform. All rights reserved.</p>
-          <div className="flex justify-center gap-4 pt-2">
-            <Link href="/" className="hover:underline">
-              홈 대시보드
-            </Link>
-            <Link href="/guides" className="hover:underline">
-              가이드 전체보기
-            </Link>
-          </div>
-        </div>
-      </footer>
+      {/* 글로벌 푸터 */}
+      <Footer />
     </div>
   );
 }
