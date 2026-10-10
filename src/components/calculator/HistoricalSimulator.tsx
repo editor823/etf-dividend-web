@@ -22,6 +22,7 @@ import {
   simulateHistoricalInvestment,
 } from '@/lib/calculator/historical-simulator';
 import { formatCurrency, formatPercent, formatNumber } from '@/lib/utils';
+import HistoricalSimulatorGuide from './guides/HistoricalSimulatorGuide';
 
 export default function HistoricalSimulator() {
   const [ticker, setTicker] = useState<string>('SCHD');
@@ -399,6 +400,9 @@ export default function HistoricalSimulator() {
             </span>
           </div>
         </div>
+
+        {/* E-E-A-T 정적 해설 가이드 섹션 */}
+        <HistoricalSimulatorGuide />
       </div>
     </div>
   );

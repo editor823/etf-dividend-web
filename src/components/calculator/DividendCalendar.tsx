@@ -24,6 +24,7 @@ import {
   CalendarPreset,
 } from '@/lib/calculator/dividend-calendar';
 import { formatCurrency, formatNumber } from '@/lib/utils';
+import DividendCalendarGuide from './guides/DividendCalendarGuide';
 
 export default function DividendCalendar() {
   // 포트폴리오 기본 상태 (황금 월급형: SCHD 200주, JEPI 300주, JEPQ 200주)
@@ -449,6 +450,9 @@ export default function DividendCalendar() {
             );
           })}
         </div>
+
+        {/* E-E-A-T 정적 해설 가이드 섹션 */}
+        <DividendCalendarGuide />
       </div>
     </div>
   );

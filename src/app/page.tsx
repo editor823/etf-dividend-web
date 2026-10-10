@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import {
   TrendingUp,
   DollarSign,
@@ -14,6 +15,7 @@ import {
   User,
   LogOut,
   Lock,
+  BookOpen,
 } from 'lucide-react';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth/auth-context';
@@ -202,6 +204,13 @@ export default function Home() {
               >
                 캘린더
               </button>
+              <Link
+                href="/guides"
+                className="px-2.5 py-1 rounded-lg text-xs font-bold text-income hover:bg-income-light/60 transition-all flex items-center gap-1"
+              >
+                <BookOpen className="w-3 h-3" />
+                가이드
+              </Link>
             </div>
 
             {/* 내 포트폴리오 저장 버튼 */}
@@ -437,6 +446,96 @@ export default function Home() {
             })}
           </div>
         </div>
+
+        {/* 심층 리서치 가이드 아티클 섹션 (구글 애드센스 E-E-A-T 고품질 콘텐츠) */}
+        <section className="space-y-6 pt-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-subtle-border pb-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-income-light text-income text-xs font-bold mb-2">
+                <BookOpen className="w-3.5 h-3.5" />
+                전문가 심층 분석 리포트
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-brand-primary tracking-tight">
+                미국 배당 ETF 핵심 가이드 아티클
+              </h2>
+              <p className="text-xs sm:text-sm text-brand-muted mt-1">
+                기초지수 스크리닝 알고리즘부터 파생 커버드콜 구조, 절세 계좌 전략까지 엄선된 전문 지식을 확인하세요.
+              </p>
+            </div>
+            <Link
+              href="/guides"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-income hover:underline self-start sm:self-auto"
+            >
+              <span>전체 가이드 목록 보기</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Link
+              href="/guides/schd-complete-guide"
+              className="group bg-white rounded-2xl border border-subtle-border p-6 shadow-card hover:shadow-elevated transition-all flex flex-col justify-between"
+            >
+              <div className="space-y-3">
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-income-light text-income">
+                  배당성장 심층분석
+                </span>
+                <h3 className="text-base font-bold text-brand-primary group-hover:text-income transition-colors line-clamp-2">
+                  SCHD 배당성장 ETF 완벽 분석: 선별 기준, 10년 성장률 및 장기 보유 전략
+                </h3>
+                <p className="text-xs text-brand-muted line-clamp-2 leading-relaxed">
+                  Dow Jones U.S. Dividend 100 지수의 엄격한 4단계 필터링과 복리 효과를 극대화하는 실전 투자 지침
+                </p>
+              </div>
+              <div className="pt-4 mt-4 border-t border-subtle-border/60 flex items-center justify-between text-xs text-income font-bold">
+                <span>리포트 읽기</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-all" />
+              </div>
+            </Link>
+
+            <Link
+              href="/guides/covered-call-mechanics"
+              className="group bg-white rounded-2xl border border-subtle-border p-6 shadow-card hover:shadow-elevated transition-all flex flex-col justify-between"
+            >
+              <div className="space-y-3">
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-income-light text-income">
+                  고인컴/파생전략
+                </span>
+                <h3 className="text-base font-bold text-brand-primary group-hover:text-income transition-colors line-clamp-2">
+                  커버드콜 ETF JEPI·JEPQ의 작동 원리와 상승장 언더퍼폼 한계 극복법
+                </h3>
+                <p className="text-xs text-brand-muted line-clamp-2 leading-relaxed">
+                  ELN 구조화 채권과 OTM 콜옵션 매도를 통한 월배당 창출 메커니즘 및 원금 잠식 방어 가이드
+                </p>
+              </div>
+              <div className="pt-4 mt-4 border-t border-subtle-border/60 flex items-center justify-between text-xs text-income font-bold">
+                <span>리포트 읽기</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-all" />
+              </div>
+            </Link>
+
+            <Link
+              href="/guides/isa-vs-direct-investment"
+              className="group bg-white rounded-2xl border border-subtle-border p-6 shadow-card hover:shadow-elevated transition-all flex flex-col justify-between"
+            >
+              <div className="space-y-3">
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-income-light text-income">
+                  세금/절세 전략
+                </span>
+                <h3 className="text-base font-bold text-brand-primary group-hover:text-income transition-colors line-clamp-2">
+                  국내 상장 미국 배당 ETF vs 미국 직투 세금 차이 및 절세 계좌 완벽 가이드
+                </h3>
+                <p className="text-xs text-brand-muted line-clamp-2 leading-relaxed">
+                  15% 원천징수, 금융소득종합과세 2,000만 원, ISA 비과세 혜택과 연금저축 과세이연 실전 비교
+                </p>
+              </div>
+              <div className="pt-4 mt-4 border-t border-subtle-border/60 flex items-center justify-between text-xs text-income font-bold">
+                <span>리포트 읽기</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-all" />
+              </div>
+            </Link>
+          </div>
+        </section>
       </main>
 
       {/* 포트폴리오 저장 모달 팝업 */}
@@ -451,6 +550,9 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-brand-muted">
           <p>© 2026 Dividend Intelligence Platform. All rights reserved.</p>
           <div className="flex items-center gap-4">
+            <Link href="/guides" className="hover:underline">
+              투자 가이드
+            </Link>
             <button
               onClick={() => setIsAdminModalOpen(true)}
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg hover:bg-brand-secondary text-brand-muted hover:text-brand-primary transition-colors cursor-pointer"

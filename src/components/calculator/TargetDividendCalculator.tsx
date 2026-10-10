@@ -17,6 +17,7 @@ import {
   US_DIVIDEND_TAX_RATE,
 } from '@/lib/calculator/target-dividend';
 import { formatCurrency, formatPercent, formatNumber } from '@/lib/utils';
+import TargetDividendGuide from './guides/TargetDividendGuide';
 
 export default function TargetDividendCalculator() {
   // 상태 관리
@@ -488,6 +489,9 @@ export default function TargetDividendCalculator() {
             국내 금융소득종합과세(연간 금융소득 2,000만 원 초과 시)나 환율 변동, 주가 및 배당금 변동에 따라 실제 수령액은 차이가 있을 수 있습니다.
           </div>
         </div>
+
+        {/* E-E-A-T 정적 해설 가이드 섹션 */}
+        <TargetDividendGuide />
       </div>
     </div>
   );

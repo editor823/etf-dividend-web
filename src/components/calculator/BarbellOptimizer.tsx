@@ -13,6 +13,7 @@ import {
   HighIncomePartner,
 } from '@/lib/calculator/barbell-optimizer';
 import { formatCurrency, formatPercent, formatNumber } from '@/lib/utils';
+import BarbellOptimizerGuide from './guides/BarbellOptimizerGuide';
 
 export default function BarbellOptimizer() {
   const [schdWeight, setSchdWeight] = useState<number>(50); // 기본 50:50
@@ -520,6 +521,9 @@ export default function BarbellOptimizer() {
             </div>
           </div>
         </div>
+
+        {/* E-E-A-T 정적 해설 가이드 섹션 */}
+        <BarbellOptimizerGuide />
       </div>
     </div>
   );

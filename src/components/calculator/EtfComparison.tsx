@@ -13,6 +13,7 @@ import {
   COMPARISON_ETFS,
   compareEtfs,
 } from '@/lib/calculator/etf-comparison';
+import EtfComparisonGuide from './guides/EtfComparisonGuide';
 
 export default function EtfComparison() {
   const [tickerA, setTickerA] = useState<string>('SCHD');
@@ -402,6 +403,9 @@ export default function EtfComparison() {
             </div>
           </div>
         </div>
+
+        {/* E-E-A-T 정적 해설 가이드 섹션 */}
+        <EtfComparisonGuide />
       </div>
     </div>
   );

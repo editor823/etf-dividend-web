@@ -25,6 +25,7 @@ import {
   DripPreset,
 } from '@/lib/calculator/drip-simulator';
 import { formatCurrency, formatPercent, formatNumber } from '@/lib/utils';
+import DripSimulatorGuide from './guides/DripSimulatorGuide';
 
 export default function DripSimulator() {
   const [initialInvestment, setInitialInvestment] = useState<number>(10000); // 초기 $10,000
@@ -466,6 +467,9 @@ export default function DripSimulator() {
             투자 초기 3~5년은 재투자와 단순 인출의 차이가 미미해 보이지만, 10년이 넘어가는 순간 재투자된 배당금으로 산 주식이 또 배당을 낳으면서 자산 곡선이 수직으로 상승합니다. 은퇴 전까지는 무조건 배당 재투자(DRIP)를 켜두는 것이 자산 증식의 지름길입니다.
           </div>
         </div>
+
+        {/* E-E-A-T 정적 해설 가이드 섹션 */}
+        <DripSimulatorGuide />
       </div>
     </div>
   );
