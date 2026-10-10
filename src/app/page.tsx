@@ -11,14 +11,9 @@ import {
   ArrowRight,
   History,
   Repeat,
-  Bookmark,
-  User,
-  LogOut,
-  Lock,
   BookOpen,
 } from 'lucide-react';
 import { isSupabaseConfigured } from '@/lib/supabase';
-import { useAuth } from '@/lib/auth/auth-context';
 import TargetDividendCalculator from '@/components/calculator/TargetDividendCalculator';
 import EtfComparison from '@/components/calculator/EtfComparison';
 import HistoricalSimulator from '@/components/calculator/HistoricalSimulator';
@@ -27,11 +22,11 @@ import DripSimulator from '@/components/calculator/DripSimulator';
 import DividendCalendar from '@/components/calculator/DividendCalendar';
 import SavePortfolioModal from '@/components/auth/SavePortfolioModal';
 import AdminDashboardModal from '@/components/admin/AdminDashboardModal';
+import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import AdBannerSlot from '@/components/ads/AdBannerSlot';
 
 export default function Home() {
-  const { user, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<
     'reverse' | 'compare' | 'timemachine' | 'barbell' | 'drip' | 'calendar'
   >('reverse');
@@ -127,138 +122,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-brand-bg text-brand-primary flex flex-col selection:bg-brand-secondary selection:text-brand-primary">
       {/* 글로벌 상단 헤더 */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-subtle-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-brand-primary text-white flex items-center justify-center shadow-md">
-              <TrendingUp className="w-5 h-5 text-income" />
-            </div>
-            <div>
-              <span className="font-bold text-lg tracking-tight text-brand-primary block leading-none">
-                DIVIDEND INTEL
-              </span>
-              <span className="text-xs text-brand-muted font-mono">
-                미국 배당 ETF 인텔리전스
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {/* 네비게이션 탭 버튼들 */}
-            <div className="hidden lg:flex items-center gap-1 bg-brand-secondary/40 p-1 rounded-xl">
-              <button
-                onClick={() => scrollToSection('reverse')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                  activeTab === 'reverse'
-                    ? 'bg-brand-primary text-white shadow-xs'
-                    : 'text-brand-primary hover:bg-brand-secondary'
-                }`}
-              >
-                역산기
-              </button>
-              <button
-                onClick={() => scrollToSection('compare')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                  activeTab === 'compare'
-                    ? 'bg-brand-primary text-white shadow-xs'
-                    : 'text-brand-primary hover:bg-brand-secondary'
-                }`}
-              >
-                맞짱
-              </button>
-              <button
-                onClick={() => scrollToSection('timemachine')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                  activeTab === 'timemachine'
-                    ? 'bg-brand-primary text-white shadow-xs'
-                    : 'text-brand-primary hover:bg-brand-secondary'
-                }`}
-              >
-                타임머신
-              </button>
-              <button
-                onClick={() => scrollToSection('barbell')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                  activeTab === 'barbell'
-                    ? 'bg-brand-primary text-white shadow-xs'
-                    : 'text-brand-primary hover:bg-brand-secondary'
-                }`}
-              >
-                바벨
-              </button>
-              <button
-                onClick={() => scrollToSection('drip')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                  activeTab === 'drip'
-                    ? 'bg-brand-primary text-white shadow-xs'
-                    : 'text-brand-primary hover:bg-brand-secondary'
-                }`}
-              >
-                DRIP
-              </button>
-              <button
-                onClick={() => scrollToSection('calendar')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                  activeTab === 'calendar'
-                    ? 'bg-brand-primary text-white shadow-xs'
-                    : 'text-brand-primary hover:bg-brand-secondary'
-                }`}
-              >
-                캘린더
-              </button>
-              <Link
-                href="/guides"
-                className="px-2.5 py-1 rounded-lg text-xs font-bold text-income hover:bg-income-light/60 transition-all flex items-center gap-1"
-              >
-                <BookOpen className="w-3 h-3" />
-                가이드
-              </Link>
-            </div>
-
-            {/* 내 포트폴리오 저장 버튼 */}
-            <button
-              onClick={() => setIsSaveModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-secondary hover:bg-brand-secondaryHover text-brand-primary text-xs font-bold transition-all shadow-2xs"
-            >
-              <Bookmark className="w-3.5 h-3.5 text-income" />
-              <span className="hidden sm:inline">포트폴리오 저장</span>
-            </button>
-
-            {/* 유저 로그인 상태 */}
-            {user ? (
-              <div className="flex items-center gap-2 pl-1">
-                <div className="w-8 h-8 rounded-full bg-brand-primary text-white flex items-center justify-center text-xs font-bold shadow-2xs">
-                  {user.name.charAt(0)}
-                </div>
-                <button
-                  onClick={() => signOut()}
-                  title="로그아웃"
-                  className="p-1.5 rounded-lg text-brand-muted hover:text-alert transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => setIsSaveModalOpen(true)}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-brand-primary hover:bg-brand-dark text-white text-xs font-bold transition-all shadow-sm"
-              >
-                <User className="w-3.5 h-3.5" />
-                <span>로그인</span>
-              </button>
-            )}
-
-            {/* 관리자 모드 버튼 */}
-            <button
-              onClick={() => setIsAdminModalOpen(true)}
-              className="p-1.5 rounded-xl text-brand-muted hover:text-brand-primary hover:bg-brand-secondary transition-colors"
-              title="시스템 관리자 모드"
-            >
-              <Lock className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      </header>
+      <Header
+        activeTab={activeTab}
+        onTabSelect={scrollToSection}
+        onOpenSaveModal={() => setIsSaveModalOpen(true)}
+        onOpenAdminModal={() => setIsAdminModalOpen(true)}
+      />
 
       {/* 메인 히어로 섹션 */}
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 space-y-16">

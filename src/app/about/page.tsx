@@ -1,6 +1,4 @@
-import Link from 'next/link';
 import {
-  TrendingUp,
   Target,
   ShieldCheck,
   Cpu,
@@ -8,8 +6,8 @@ import {
   CheckCircle2,
   Users,
   Database,
-  ArrowLeft,
 } from 'lucide-react';
+import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import type { Metadata } from 'next';
 
@@ -22,32 +20,8 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-brand-bg text-brand-primary flex flex-col selection:bg-brand-secondary selection:text-brand-primary">
-      {/* 헤더 */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/85 border-b border-subtle-border">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-brand-primary text-white flex items-center justify-center shadow-md group-hover:bg-brand-dark transition-colors">
-              <TrendingUp className="w-5 h-5 text-income" />
-            </div>
-            <div>
-              <span className="font-bold text-lg tracking-tight text-brand-primary block leading-none">
-                DIVIDEND INTEL
-              </span>
-              <span className="text-xs text-brand-muted font-mono">
-                플랫폼 소개
-              </span>
-            </div>
-          </Link>
-
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-brand-secondary hover:bg-brand-secondaryHover text-brand-primary text-xs font-bold transition-all"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>대시보드로 돌아가기</span>
-          </Link>
-        </div>
-      </header>
+      {/* 전역 통합 헤더 */}
+      <Header />
 
       {/* 본문 */}
       <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 space-y-12">
