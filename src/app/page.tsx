@@ -7,16 +7,13 @@ import {
   PieChart,
   Scale,
   Calendar,
-  Database,
-  ShieldCheck,
   ArrowRight,
-  BarChart3,
-  CheckCircle2,
   History,
   Repeat,
   Bookmark,
   User,
   LogOut,
+  Lock,
 } from 'lucide-react';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { useAuth } from '@/lib/auth/auth-context';
@@ -27,6 +24,7 @@ import BarbellOptimizer from '@/components/calculator/BarbellOptimizer';
 import DripSimulator from '@/components/calculator/DripSimulator';
 import DividendCalendar from '@/components/calculator/DividendCalendar';
 import SavePortfolioModal from '@/components/auth/SavePortfolioModal';
+import AdminDashboardModal from '@/components/admin/AdminDashboardModal';
 
 export default function Home() {
   const { user, signOut } = useAuth();
@@ -34,6 +32,7 @@ export default function Home() {
     'reverse' | 'compare' | 'timemachine' | 'barbell' | 'drip' | 'calendar'
   >('reverse');
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
 
   const scrollToSection = (
     tab: 'reverse' | 'compare' | 'timemachine' | 'barbell' | 'drip' | 'calendar'
@@ -237,6 +236,15 @@ export default function Home() {
                 <span>로그인</span>
               </button>
             )}
+
+            {/* 관리자 모드 버튼 */}
+            <button
+              onClick={() => setIsAdminModalOpen(true)}
+              className="p-1.5 rounded-xl text-brand-muted hover:text-brand-primary hover:bg-brand-secondary transition-colors"
+              title="시스템 관리자 모드"
+            >
+              <Lock className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       </header>
@@ -245,8 +253,8 @@ export default function Home() {
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 space-y-16">
         <div className="text-center max-w-3xl mx-auto space-y-5">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-secondary text-brand-primary text-xs font-semibold uppercase tracking-wider">
-            <CheckCircle2 className="w-4 h-4 text-income" />
-            Phase 3 Supabase 데이터 서비스 & 인증 연동 완료
+            <TrendingUp className="w-4 h-4 text-income" />
+            2026 미국 배당 ETF 실시간 인텔리전스 & 현금흐름 분석
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] text-brand-primary">
@@ -257,46 +265,26 @@ export default function Home() {
           </h1>
 
           <p className="text-base sm:text-lg text-brand-muted max-w-2xl mx-auto leading-relaxed">
-            SCHD, JEPI, JEPQ, VOO 핵심 배당 ETF의 정밀한 세후 역산, 복리 스노우볼,
-            1:1 맞짱 비교, 바벨 최적화, 월별 캘린더까지 — 24시간 0원 서버리스 아키텍처로 구현된 금융 인텔리전스 대시보드
+            SCHD, JEPI, JEPQ, VOO 등 미국 대표 배당 ETF의 세후 실수령액 역산부터 1:1 맞짱 비교, 복리 스노우볼, 배당 캘린더까지 한눈에 분석하세요.
           </p>
 
-          {/* 시스템 진단 카드 */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 text-left">
-            <div className="bg-white p-5 rounded-2xl border border-subtle-border shadow-card flex items-start gap-3">
-              <div className="p-2.5 rounded-xl bg-brand-secondary text-brand-primary">
-                <BarChart3 className="w-5 h-5 text-brand-primary" />
-              </div>
-              <div>
-                <p className="text-xs text-brand-muted font-medium">프레임워크</p>
-                <h2 className="text-sm font-bold text-brand-primary">Next.js 14 App Router</h2>
-                <p className="text-xs text-income mt-1 font-mono">Static Export Ready</p>
-              </div>
-            </div>
-
-            <div className="bg-white p-5 rounded-2xl border border-subtle-border shadow-card flex items-start gap-3">
-              <div className="p-2.5 rounded-xl bg-income-light text-income">
-                <Database className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-xs text-brand-muted font-medium">백엔드 연동</p>
-                <h2 className="text-sm font-bold text-brand-primary">Supabase PostgreSQL</h2>
-                <p className="text-xs text-brand-muted mt-1 font-mono">
-                  {user ? (user.isDemo ? '데모 유저 로그인' : user.email) : (isSupabaseConfigured ? 'API Connected' : '하이브리드 데모 모드')}
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-white p-5 rounded-2xl border border-subtle-border shadow-card flex items-start gap-3">
-              <div className="p-2.5 rounded-xl bg-brand-secondary text-brand-primary">
-                <ShieldCheck className="w-5 h-5 text-income" />
-              </div>
-              <div>
-                <p className="text-xs text-brand-muted font-medium">인터랙티브 모듈</p>
-                <h2 className="text-sm font-bold text-brand-primary">6대 핵심 엔진 가동</h2>
-                <p className="text-xs text-income mt-1 font-mono">포트폴리오 저장 연동</p>
-              </div>
-            </div>
+          {/* 일반 방문자용 주요 기능 빠른 안내 뱃지 바 */}
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-2 text-xs">
+            <span className="px-3 py-1.5 rounded-xl bg-white border border-subtle-border shadow-2xs font-semibold text-brand-primary flex items-center gap-1.5">
+              🎯 목표 월배당 역산
+            </span>
+            <span className="px-3 py-1.5 rounded-xl bg-white border border-subtle-border shadow-2xs font-semibold text-brand-primary flex items-center gap-1.5">
+              ⚔️ 1:1 ETF 맞짱 비교
+            </span>
+            <span className="px-3 py-1.5 rounded-xl bg-white border border-subtle-border shadow-2xs font-semibold text-brand-primary flex items-center gap-1.5">
+              ⚖️ 바벨 최적화
+            </span>
+            <span className="px-3 py-1.5 rounded-xl bg-white border border-subtle-border shadow-2xs font-semibold text-brand-primary flex items-center gap-1.5">
+              ❄️ DRIP 복리 시뮬레이터
+            </span>
+            <span className="px-3 py-1.5 rounded-xl bg-white border border-subtle-border shadow-2xs font-semibold text-brand-primary flex items-center gap-1.5">
+              📅 12개월 배당 캘린더
+            </span>
           </div>
         </div>
 
@@ -462,13 +450,25 @@ export default function Home() {
       <footer className="border-t border-subtle-border bg-white mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-brand-muted">
           <p>© 2026 Dividend Intelligence Platform. All rights reserved.</p>
-          <div className="flex items-center gap-6">
-            <span>Serverless + Edge CDN Architecture</span>
-            <span>Cloudflare Pages</span>
-            <span>Supabase BaaS</span>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setIsAdminModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg hover:bg-brand-secondary text-brand-muted hover:text-brand-primary transition-colors cursor-pointer"
+              title="관리자 전용 시스템 모드"
+            >
+              <Lock className="w-3.5 h-3.5" />
+              <span>관리자 모드</span>
+            </button>
           </div>
         </div>
       </footer>
+
+      {/* 관리자 모드 모달 */}
+      <AdminDashboardModal
+        isOpen={isAdminModalOpen}
+        onClose={() => setIsAdminModalOpen(false)}
+        isSupabaseConfigured={isSupabaseConfigured}
+      />
     </div>
   );
 }
