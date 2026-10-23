@@ -1,12 +1,16 @@
+import Link from 'next/link';
 import { FileText, Mail, AlertTriangle } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '서비스 이용약관 (Terms of Service) | DIVIDEND INTEL',
+  title: '서비스 이용약관 (Terms of Service)',
   description:
     'DIVIDEND INTEL 웹사이트의 서비스 이용약관, 저작권 안내 및 사용자 권리/의무 규정입니다.',
+  alternates: {
+    canonical: 'https://etf-dividend-web.pages.dev/terms',
+  },
 };
 
 export default function TermsOfServicePage() {
@@ -16,7 +20,14 @@ export default function TermsOfServicePage() {
       <Header />
 
       {/* 본문 */}
-      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 space-y-10">
+      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 space-y-10">
+        {/* 상단 브레드크럼 (Breadcrumb) 네비게이션 */}
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-brand-muted font-medium">
+          <Link href="/" className="hover:text-brand-primary hover:underline">홈</Link>
+          <span className="text-brand-muted/60">/</span>
+          <span className="text-brand-primary font-bold">서비스 이용약관 (Terms)</span>
+        </nav>
+
         <div className="space-y-3 border-b border-subtle-border pb-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-secondary text-brand-primary text-xs font-bold">
             <FileText className="w-4 h-4 text-income" />

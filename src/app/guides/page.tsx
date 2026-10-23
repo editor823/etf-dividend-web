@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   title: '전문 배당 투자 가이드 & 심층 분석 리포트',
   description:
     'SCHD 10년 배당성장률 검증, 커버드콜 JEPI·JEPQ 옵션 작동 원리와 한계, 국내 상장 ETF vs 미국 직투 세금 비교 등 실전 투자자를 위한 E-E-A-T 검증 배당 리포트 모음.',
+  alternates: {
+    canonical: 'https://etf-dividend-web.pages.dev/guides',
+  },
   openGraph: {
     title: '전문 배당 투자 가이드 & 분석 리포트 | 디비던드 인텔',
     description:
@@ -45,6 +48,13 @@ export default function GuidesIndexPage() {
 
       {/* 가이드 목록 메인 영역 */}
       <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 space-y-12">
+        {/* 상단 브레드크럼 (Breadcrumb) 네비게이션 */}
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-brand-muted font-medium">
+          <Link href="/" className="hover:text-brand-primary hover:underline">홈</Link>
+          <span className="text-brand-muted/60">/</span>
+          <span className="text-brand-primary font-bold">배당 투자 가이드 리포트</span>
+        </nav>
+
         {/* 상단 히어로 헤더 섹션 (E-E-A-T 전문성 강조) */}
         <section className="text-center space-y-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-income-light text-income text-xs font-bold shadow-2xs">

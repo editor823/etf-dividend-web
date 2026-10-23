@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   TrendingUp,
@@ -42,6 +42,33 @@ export default function Home() {
       el.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  // URL 쿼리 파라미터(?tab=...) 또는 해시 기반 탭 자동 활성화 & 스크롤
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get('tab');
+    const validTabs: Array<'reverse' | 'compare' | 'timemachine' | 'barbell' | 'drip' | 'calendar'> = [
+      'reverse',
+      'compare',
+      'timemachine',
+      'barbell',
+      'drip',
+      'calendar',
+    ];
+    const isTab = (val: string | null): val is 'reverse' | 'compare' | 'timemachine' | 'barbell' | 'drip' | 'calendar' =>
+      validTabs.includes(val as 'reverse' | 'compare' | 'timemachine' | 'barbell' | 'drip' | 'calendar');
+
+    if (isTab(tabParam)) {
+      setActiveTab(tabParam);
+      setTimeout(() => {
+        const el = document.getElementById('interactive-tools');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, []);
 
   // 저장용 기본 포트폴리오 예시 데이터
   const currentHoldingsToSave = [
@@ -282,10 +309,15 @@ export default function Home() {
             {coreFeatures.map((item, index) => {
               const Icon = item.icon;
               return (
-                <div
+                <a
                   key={index}
-                  onClick={() => scrollToSection(item.tab)}
-                  className="group bg-white rounded-2xl p-6 border border-income/40 shadow-card hover:shadow-elevated hover:-translate-y-1 cursor-pointer ring-1 ring-income/20 transition-all duration-300 relative flex flex-col justify-between"
+                  href="#interactive-tools"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToSection(item.tab);
+                  }}
+                  title={`${item.title} 바로 실행하기`}
+                  className="group bg-white rounded-2xl p-6 border border-income/40 shadow-card hover:shadow-elevated hover:-translate-y-1 cursor-pointer ring-1 ring-income/20 transition-all duration-300 relative flex flex-col justify-between text-left"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-4">
@@ -315,7 +347,7 @@ export default function Home() {
                     </span>
                     <ArrowRight className="w-4 h-4 text-income group-hover:translate-x-1.5 transition-all" />
                   </div>
-                </div>
+                </a>
               );
             })}
           </div>

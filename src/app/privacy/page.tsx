@@ -1,12 +1,16 @@
+import Link from 'next/link';
 import { ShieldCheck, Lock, Mail } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '개인정보처리방침 (Privacy Policy) | DIVIDEND INTEL',
+  title: '개인정보처리방침 (Privacy Policy)',
   description:
     'DIVIDEND INTEL의 개인정보처리방침 및 구글 애드센스(Google AdSense) 쿠키 수집 방침 안내입니다.',
+  alternates: {
+    canonical: 'https://etf-dividend-web.pages.dev/privacy',
+  },
 };
 
 export default function PrivacyPolicyPage() {
@@ -16,11 +20,18 @@ export default function PrivacyPolicyPage() {
       <Header />
 
       {/* 본문 */}
-      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 space-y-10">
+      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 space-y-10">
+        {/* 상단 브레드크럼 (Breadcrumb) 네비게이션 */}
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-brand-muted font-medium">
+          <Link href="/" className="hover:text-brand-primary hover:underline">홈</Link>
+          <span className="text-brand-muted/60">/</span>
+          <span className="text-brand-primary font-bold">개인정보처리방침 (Privacy Policy)</span>
+        </nav>
+
         <div className="space-y-3 border-b border-subtle-border pb-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-income-light text-income text-xs font-bold">
             <ShieldCheck className="w-4 h-4" />
-            GDPR & 대한민국 개인정보보호법 준수
+            GDPR &amp; 대한민국 개인정보보호법 준수
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-brand-primary tracking-tight">
             개인정보처리방침 (Privacy Policy)

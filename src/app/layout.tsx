@@ -25,18 +25,19 @@ export const metadata: Metadata = {
     template: "%s | 디비던드 인텔 (DIVIDEND INTEL)",
   },
   description:
-    "SCHD, JEPI, JEPQ 배당 역산기, 1:1 맞짱 비교, DRIP 복리 스노우볼, 과거 백테스트 및 월별 배당 캘린더까지 제공하는 무료 배당 플랫폼",
+    "SCHD, JEPI, JEPQ, VOO 등 미국 대표 배당 ETF 17종의 15% 세후 실수령액 역산기, 1:1 맞짱 비교, DRIP 복리 스노우볼 및 12개월 배당 캘린더를 제공하는 무료 배당 퀀트 플랫폼",
   keywords: [
     "미국 배당 ETF",
-    "SCHD",
-    "JEPI",
-    "JEPQ",
+    "SCHD 배당금",
+    "JEPI 배당률",
+    "JEPQ 월배당",
     "배당 계산기",
-    "DRIP 복리",
+    "DRIP 복리 스노우볼",
     "배당 캘린더",
     "은퇴 현금흐름",
-    "월배당",
-    "배당소득세",
+    "바벨 포트폴리오",
+    "15% 배당소득세",
+    "ISA 절세 계좌",
   ],
   alternates: {
     canonical: BASE_URL,
@@ -44,7 +45,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "디비던드 인텔 | 미국 배당 ETF 정밀 계산기 & 인컴 투자 분석",
     description:
-      "SCHD, JEPI, JEPQ 배당 역산기, 1:1 맞짱 비교, DRIP 복리 스노우볼, 과거 백테스트 및 월별 배당 캘린더까지 제공하는 무료 배당 플랫폼",
+      "SCHD, JEPI, JEPQ, VOO 등 미국 대표 배당 ETF 17종의 15% 세후 실수령액 역산기, 1:1 맞짱 비교, DRIP 복리 스노우볼 및 12개월 배당 캘린더를 제공하는 무료 배당 퀀트 플랫폼",
     url: BASE_URL,
     siteName: "디비던드 인텔 (DIVIDEND INTEL)",
     images: [
@@ -62,7 +63,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "디비던드 인텔 | 미국 배당 ETF 정밀 계산기 & 인컴 투자 분석",
     description:
-      "SCHD, JEPI, JEPQ 배당 역산기, 1:1 맞짱 비교, DRIP 복리 스노우볼 및 월별 배당 캘린더",
+      "SCHD, JEPI, JEPQ, VOO 등 미국 대표 배당 ETF 17종의 15% 세후 실수령액 역산기, 1:1 맞짱 비교, DRIP 복리 스노우볼 및 12개월 배당 캘린더",
     images: ["/og-image.jpg"],
   },
 };
@@ -87,7 +88,7 @@ const jsonLdData = {
       applicationCategory: "FinanceApplication",
       operatingSystem: "All",
       description:
-        "SCHD, JEPI, JEPQ, VOO 배당 역산 및 복리 스노우볼 시뮬레이션 금융 도구",
+        "SCHD, JEPI, JEPQ, VOO 등 미국 대표 배당 ETF 17종의 15% 세후 실수령액 역산기, 1:1 맞짱 비교, DRIP 복리 스노우볼 및 12개월 배당 캘린더 금융 도구",
       offers: {
         "@type": "Offer",
         price: "0",

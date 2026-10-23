@@ -4,45 +4,43 @@ import { GUIDE_POSTS } from '@/lib/data/guides-data';
 const BASE_URL = 'https://etf-dividend-web.pages.dev';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const currentDate = new Date().toISOString().split('T')[0];
-
-  // 1. 기본 핵심 정적 페이지
+  // 1. 기본 핵심 정적 페이지 (실제 변경 및 공시 기준일 제공)
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: BASE_URL,
-      lastModified: currentDate,
+      lastModified: '2026-03-25',
       changeFrequency: 'daily',
       priority: 1.0,
     },
     {
       url: `${BASE_URL}/guides`,
-      lastModified: currentDate,
+      lastModified: '2026-03-25',
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
       url: `${BASE_URL}/about`,
-      lastModified: currentDate,
+      lastModified: '2026-03-25',
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${BASE_URL}/privacy`,
-      lastModified: currentDate,
+      lastModified: '2026-03-15',
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.6,
     },
     {
       url: `${BASE_URL}/terms`,
-      lastModified: currentDate,
+      lastModified: '2026-03-15',
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.6,
     },
     {
       url: `${BASE_URL}/disclaimer`,
-      lastModified: currentDate,
+      lastModified: '2026-03-15',
       changeFrequency: 'monthly',
-      priority: 0.7,
+      priority: 0.6,
     },
   ];
 

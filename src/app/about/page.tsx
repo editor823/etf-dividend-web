@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import {
   Target,
   ShieldCheck,
@@ -6,15 +7,25 @@ import {
   CheckCircle2,
   Users,
   Database,
+  ArrowRight,
 } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '플랫폼 소개 (About Us) | DIVIDEND INTEL 미국 배당 ETF 인텔리전스',
+  title: '플랫폼 소개 (About Us)',
   description:
-    'DIVIDEND INTEL은 미국 배당성장 및 고인컴 ETF의 현금흐름을 과학적으로 설계하고 분석하는 퀀트 리서치 플랫폼입니다.',
+    'DIVIDEND INTEL은 미국 대표 배당 ETF의 한미 조세협정 15% 세후 실수령액 역산과 퀀트 배당 시뮬레이션을 제공하는 독립 금융 엔지니어링 리서치 플랫폼입니다.',
+  alternates: {
+    canonical: 'https://etf-dividend-web.pages.dev/about',
+  },
+  openGraph: {
+    title: '플랫폼 소개 (About Us) | 디비던드 인텔 (DIVIDEND INTEL)',
+    description:
+      'DIVIDEND INTEL은 미국 배당성장 및 고인컴 ETF의 현금흐름을 과학적으로 설계하고 분석하는 독립 퀀트 리서치 플랫폼입니다.',
+    url: 'https://etf-dividend-web.pages.dev/about',
+  },
 };
 
 export default function AboutPage() {
@@ -24,7 +35,14 @@ export default function AboutPage() {
       <Header />
 
       {/* 본문 */}
-      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 space-y-12">
+      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 space-y-12">
+        {/* 상단 브레드크럼 (Breadcrumb) 네비게이션 */}
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-brand-muted font-medium">
+          <Link href="/" className="hover:text-brand-primary hover:underline">홈</Link>
+          <span className="text-brand-muted/60">/</span>
+          <span className="text-brand-primary font-bold">플랫폼 소개 (About Us)</span>
+        </nav>
+
         {/* 히어로 헤더 */}
         <div className="text-center space-y-4 max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-secondary text-brand-primary text-xs font-semibold">
@@ -145,6 +163,33 @@ export default function AboutPage() {
             <span className="text-[11px] text-brand-muted">
               (영업일 기준 24~48시간 이내 회신)
             </span>
+          </div>
+        </section>
+
+        {/* 하단 계산기 및 가이드 내부 이동 네비게이션 카드 */}
+        <section className="bg-white rounded-3xl border border-subtle-border p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-sm">
+          <div className="space-y-1 text-center sm:text-left">
+            <h3 className="text-base sm:text-lg font-bold text-brand-primary">
+              실시간 데이터로 배당 포트폴리오를 설계해 보세요
+            </h3>
+            <p className="text-xs text-brand-muted leading-relaxed">
+              17개 미국 대표 배당 ETF의 역산기, 1:1 맞짱 비교, 바벨 최적화기 및 12개월 캘린더를 무료로 이용할 수 있습니다.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-2.5 shrink-0">
+            <Link
+              href="/?tab=reverse#interactive-tools"
+              className="px-5 py-2.5 rounded-xl bg-brand-primary hover:bg-brand-dark text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5"
+            >
+              <span>계산기 대시보드</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+            <Link
+              href="/guides"
+              className="px-5 py-2.5 rounded-xl bg-brand-secondary hover:bg-brand-secondary/80 text-brand-primary text-xs font-bold transition-all border border-subtle-border"
+            >
+              투자 가이드 리포트
+            </Link>
           </div>
         </section>
       </main>

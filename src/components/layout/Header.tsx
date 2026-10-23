@@ -289,33 +289,45 @@ export default function Header({
               <span className="text-[10px] text-brand-muted">E-E-A-T</span>
             </Link>
 
-            {/* 홈에서 탭 전환 빠른 바로가기 */}
-            {isHome && onTabSelect && (
-              <div className="pt-2">
-                <span className="text-[10px] text-brand-muted font-mono uppercase tracking-wider px-1 block mb-1.5">
-                  계산기 바로가기
-                </span>
-                <div className="grid grid-cols-3 gap-1.5">
-                  {tabList.map((tab) => (
-                    <button
+            {/* 6대 핵심 배당 계산기 바로가기 (어느 페이지에서든 접근 가능) */}
+            <div className="pt-2">
+              <span className="text-[10px] text-brand-muted font-mono uppercase tracking-wider px-1 block mb-1.5">
+                핵심 배당 계산기 바로가기
+              </span>
+              <div className="grid grid-cols-3 gap-1.5">
+                {tabList.map((tab) => {
+                  if (isHome && onTabSelect) {
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => {
+                          onTabSelect(tab.id);
+                          setMobileMenuOpen(false);
+                        }}
+                        className={`p-2 rounded-lg text-xs font-bold text-center border transition-all ${
+                          activeTab === tab.id
+                            ? 'bg-income text-white border-income shadow-xs'
+                            : 'bg-white border-subtle-border text-brand-primary hover:bg-brand-secondary'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    );
+                  }
+                  return (
+                    <Link
                       key={tab.id}
-                      type="button"
-                      onClick={() => {
-                        onTabSelect(tab.id);
-                        setMobileMenuOpen(false);
-                      }}
-                      className={`p-2 rounded-lg text-xs font-bold text-center border transition-all ${
-                        activeTab === tab.id
-                          ? 'bg-income text-white border-income'
-                          : 'bg-white border-subtle-border text-brand-primary'
-                      }`}
+                      href={`/?tab=${tab.id}#interactive-tools`}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="p-2 rounded-lg text-xs font-bold text-center border bg-white border-subtle-border text-brand-primary hover:bg-brand-secondary transition-colors"
                     >
                       {tab.label}
-                    </button>
-                  ))}
-                </div>
+                    </Link>
+                  );
+                })}
               </div>
-            )}
+            </div>
 
             {/* 하단 유틸리티 (로그인, 관리자) */}
             <div className="pt-3 border-t border-subtle-border flex items-center justify-between">

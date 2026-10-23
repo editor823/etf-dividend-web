@@ -1,12 +1,16 @@
+import Link from 'next/link';
 import { ShieldAlert, AlertTriangle, Mail } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '투자 면책조항 (Financial Disclaimer) | DIVIDEND INTEL',
+  title: '투자 면책조항 (Financial Disclaimer)',
   description:
     'DIVIDEND INTEL의 금융 투자 면책조항 및 리스크 안내입니다. 모든 시뮬레이션은 참고용 정보 제공 목적입니다.',
+  alternates: {
+    canonical: 'https://etf-dividend-web.pages.dev/disclaimer',
+  },
 };
 
 export default function DisclaimerPage() {
@@ -16,7 +20,14 @@ export default function DisclaimerPage() {
       <Header />
 
       {/* 본문 */}
-      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 space-y-10">
+      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 space-y-10">
+        {/* 상단 브레드크럼 (Breadcrumb) 네비게이션 */}
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-brand-muted font-medium">
+          <Link href="/" className="hover:text-brand-primary hover:underline">홈</Link>
+          <span className="text-brand-muted/60">/</span>
+          <span className="text-brand-primary font-bold">투자 면책조항 (Disclaimer)</span>
+        </nav>
+
         <div className="space-y-3 border-b border-subtle-border pb-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-alert/10 text-alert text-xs font-bold">
             <ShieldAlert className="w-4 h-4" />
