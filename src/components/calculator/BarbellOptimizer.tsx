@@ -7,6 +7,10 @@ import {
   RotateCcw,
   TrendingUp,
   AlertTriangle,
+  Percent,
+  Wallet,
+  Calendar,
+  Layers,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -510,73 +514,89 @@ export default function BarbellOptimizer() {
         )}
       </div>
 
-      {/* 4. 바벨 핵심 지표 결과 4단 카드 (Metrics Cards) */}
+      {/* 4. 바벨 핵심 지표 결과 4단 카드 (Tremor Financial Metrics Cards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* 1) 합성 시가배당률 */}
-        <div className="bg-gradient-to-br from-income to-income-dark text-white rounded-2xl p-5 shadow-card space-y-1.5">
-          <div className="flex items-center justify-between text-xs text-white/80">
-            <span>합성 시가배당률</span>
-            <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-bold">
+        <div className="bg-white rounded-2xl p-5 border border-subtle-border border-l-4 border-l-income shadow-card hover:shadow-md transition-all space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-brand-muted flex items-center gap-1.5">
+              <Percent className="w-3.5 h-3.5 text-income" />
+              합성 시가배당률
+            </span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-income-light text-income text-[11px] font-bold">
               연간 세전
             </span>
           </div>
-          <div className="text-3xl font-black num-font">
+          <div className="text-3xl font-black num-font tracking-tight text-income">
             {formatPercent(result.combinedDividendYield)}
           </div>
-          <p className="text-[11px] text-white/80">
+          <p className="text-[11px] text-brand-muted truncate">
             {growthTicker}({(growthEtf.dividendYield * 100).toFixed(1)}%) + {incomeTicker}(
             {(incomeEtf.dividendYield * 100).toFixed(1)}%) 가중평균
           </p>
         </div>
 
         {/* 2) 예상 월 세후 실수령액 */}
-        <div className="bg-white rounded-2xl p-5 border border-subtle-border shadow-card space-y-1.5">
-          <div className="flex items-center justify-between text-xs text-brand-muted">
-            <span>예상 월 세후 실수령액</span>
-            <span className="px-2 py-0.5 rounded-full bg-income-light text-income text-[10px] font-bold">
-              15% 세금 차감 후
+        <div className="bg-white rounded-2xl p-5 border border-subtle-border border-l-4 border-l-emerald-600 shadow-card hover:shadow-md transition-all space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-brand-muted flex items-center gap-1.5">
+              <Wallet className="w-3.5 h-3.5 text-emerald-600" />
+              예상 월 세후 실수령액
+            </span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-200">
+              15.4% 원천징수
             </span>
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold num-font text-income">
+          <div className="text-2xl sm:text-3xl font-black num-font tracking-tight text-brand-primary">
             {currency === 'KRW'
               ? formatCurrency(result.monthlyNetDividendKRW, 'KRW')
               : formatCurrency(result.monthlyNetDividendUSD, 'USD')}
           </div>
-          <p className="text-[11px] text-brand-muted">매월 통장에 입금되는 실수령액</p>
+          <p className="text-[11px] text-brand-muted">매월 계좌에 입금되는 순 배당소득</p>
         </div>
 
         {/* 3) 연간 총 세후 배당금 */}
-        <div className="bg-white rounded-2xl p-5 border border-subtle-border shadow-card space-y-1.5">
-          <div className="flex items-center justify-between text-xs text-brand-muted">
-            <span>연간 총 세후 배당금</span>
-            <span className="text-[11px] font-mono text-brand-muted">1년 누적</span>
+        <div className="bg-white rounded-2xl p-5 border border-subtle-border border-l-4 border-l-blue-600 shadow-card hover:shadow-md transition-all space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-brand-muted flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-blue-600" />
+              연간 총 세후 배당금
+            </span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[11px] font-bold border border-blue-200">
+              1년 누적
+            </span>
           </div>
-          <div className="text-2xl font-black num-font text-brand-primary">
+          <div className="text-2xl sm:text-3xl font-black num-font tracking-tight text-brand-primary">
             {currency === 'KRW'
               ? formatCurrency(result.annualNetDividendKRW, 'KRW')
               : formatCurrency(result.annualNetDividendUSD, 'USD')}
           </div>
           <p className="text-[11px] text-brand-muted">
-            세전: {formatCurrency(result.annualGrossDividendKRW, 'KRW')}
+            세전 총액: {formatCurrency(result.annualGrossDividendKRW, 'KRW')}
           </p>
         </div>
 
         {/* 4) 종목별 필요 매수 주수 */}
-        <div className="bg-brand-bg rounded-2xl p-5 border border-subtle-border shadow-2xs space-y-1.5">
-          <div className="flex items-center justify-between text-xs text-brand-muted">
-            <span>종목별 필요 매수 주수</span>
-            <span className="text-[10px] font-bold text-brand-primary">현재가 기준</span>
+        <div className="bg-white rounded-2xl p-5 border border-subtle-border border-l-4 border-l-amber-500 shadow-card hover:shadow-md transition-all space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-brand-muted flex items-center gap-1.5">
+              <Layers className="w-3.5 h-3.5 text-amber-600" />
+              종목별 필요 매수 주수
+            </span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 text-[11px] font-bold border border-amber-200">
+              현재가 기준
+            </span>
           </div>
-          <div className="text-base font-extrabold text-brand-primary space-y-0.5 pt-0.5">
-            <div className="flex justify-between items-center">
-              <span>{growthTicker}:</span>
-              <span className="font-mono text-brand-primary font-black">
+          <div className="text-sm font-black text-brand-primary space-y-1 pt-0.5">
+            <div className="flex justify-between items-center bg-brand-bg px-2.5 py-1 rounded-lg">
+              <span className="text-xs text-brand-muted font-bold">{growthTicker}</span>
+              <span className="num-font text-brand-primary font-black">
                 {formatNumber(result.holdings.growth.sharesToBuy)}주
               </span>
             </div>
-            <div className="flex justify-between items-center text-income">
-              <span>{incomeTicker}:</span>
-              <span className="font-mono font-black">
+            <div className="flex justify-between items-center bg-income-light/40 px-2.5 py-1 rounded-lg text-income">
+              <span className="text-xs font-bold">{incomeTicker}</span>
+              <span className="num-font font-black">
                 {formatNumber(result.holdings.income.sharesToBuy)}주
               </span>
             </div>

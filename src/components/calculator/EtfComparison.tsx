@@ -14,6 +14,8 @@ import {
   Trophy,
   Layers,
   Clock,
+  Wallet,
+  BarChart3,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -224,28 +226,32 @@ export default function EtfComparison() {
       <div className="grid grid-cols-1 md:grid-cols-11 gap-4 items-center">
         {/* 종목 A 슬롯 카드 */}
         <div
-          className={`md:col-span-5 p-6 rounded-3xl border transition-all relative ${
+          className={`md:col-span-5 p-6 rounded-3xl border transition-all relative border-l-4 ${
             finalWinner === 'A'
-              ? 'bg-gradient-to-b from-income-light/40 to-white border-income shadow-card ring-2 ring-income/20'
-              : 'bg-brand-bg border-subtle-border'
+              ? 'bg-gradient-to-b from-income-light/40 to-white border-income border-l-income shadow-card ring-2 ring-income/20'
+              : 'bg-brand-bg border-subtle-border border-l-brand-primary'
           }`}
         >
           {finalWinner === 'A' && (
-            <div className="absolute top-4 right-4 flex items-center gap-1 px-2.5 py-1 rounded-full bg-income text-white text-xs font-bold shadow-xs">
+            <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-income text-white text-xs font-black shadow-xs ring-2 ring-white">
               <Crown className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" />
-              <span>종합 우세 ({scoreA}승)</span>
+              <span>종합 판정 승리 ({scoreA}승)</span>
             </div>
           )}
 
           <div className="space-y-4">
             <div>
-              <label className="text-[11px] font-bold text-brand-muted uppercase tracking-wider block mb-1">
-                종목 A 선택 (Player A)
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-[11px] font-bold text-brand-muted uppercase tracking-wider flex items-center gap-1">
+                  <BarChart3 className="w-3.5 h-3.5 text-income" />
+                  종목 A 선택 (Player A)
+                </label>
+                <span className="text-[11px] font-mono text-brand-muted">좌측 슬롯</span>
+              </div>
               <select
                 value={tickerA}
                 onChange={(e) => setTickerA(e.target.value)}
-                className="w-full px-3 py-2.5 bg-white rounded-xl border border-subtle-border font-extrabold text-sm text-brand-primary focus:outline-none focus:ring-2 focus:ring-income cursor-pointer shadow-2xs"
+                className="w-full px-3.5 py-2.5 bg-white rounded-xl border border-subtle-border font-extrabold text-sm text-brand-primary focus:outline-none focus:ring-2 focus:ring-income cursor-pointer shadow-2xs hover:border-income/40 transition-colors"
               >
                 {Object.entries(categorizedEtfs).map(([cat, list]) => (
                   <optgroup key={cat} label={`-- ${cat} --`}>
@@ -261,10 +267,10 @@ export default function EtfComparison() {
 
             <div>
               <div className="flex items-baseline gap-2">
-                <h3 className="text-3xl font-black tracking-tight text-brand-primary">
+                <h3 className="text-3xl font-black tracking-tight num-font text-brand-primary">
                   {etfA.ticker}
                 </h3>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-brand-secondary text-brand-primary font-bold">
+                <span className="text-xs px-2.5 py-0.5 rounded-md bg-brand-secondary text-brand-primary font-bold">
                   {etfA.category}
                 </span>
                 <span className="text-xs text-brand-muted font-mono">{etfA.frequencyLabel}</span>
@@ -275,21 +281,21 @@ export default function EtfComparison() {
             </div>
 
             <div className="pt-3 border-t border-subtle-border grid grid-cols-3 gap-2 text-center sm:text-left">
-              <div>
-                <span className="text-[10px] text-brand-muted block">현재가</span>
-                <span className="text-sm sm:text-base font-bold num-font text-brand-primary">
+              <div className="bg-white/80 p-2.5 rounded-xl border border-subtle-border/80">
+                <span className="text-[10px] text-brand-muted block font-medium">현재가</span>
+                <span className="text-sm sm:text-base font-black num-font text-brand-primary block mt-0.5">
                   ${etfA.currentPrice.toFixed(2)}
                 </span>
               </div>
-              <div>
-                <span className="text-[10px] text-brand-muted block">시가배당률</span>
-                <span className="text-sm sm:text-base font-bold num-font text-income">
+              <div className="bg-white/80 p-2.5 rounded-xl border border-income/30">
+                <span className="text-[10px] text-brand-muted block font-medium">시가배당률</span>
+                <span className="text-sm sm:text-base font-black num-font text-income block mt-0.5">
                   {(etfA.dividendYield * 100).toFixed(2)}%
                 </span>
               </div>
-              <div>
-                <span className="text-[10px] text-brand-muted block">5년 배당성장</span>
-                <span className="text-sm sm:text-base font-bold num-font text-brand-primary">
+              <div className="bg-white/80 p-2.5 rounded-xl border border-subtle-border/80">
+                <span className="text-[10px] text-brand-muted block font-medium">5년 배당성장</span>
+                <span className="text-sm sm:text-base font-black num-font text-brand-primary block mt-0.5">
                   {etfA.dividendGrowth5y ? `+${(etfA.dividendGrowth5y * 100).toFixed(1)}%` : '0.0%'}
                 </span>
               </div>
@@ -306,28 +312,32 @@ export default function EtfComparison() {
 
         {/* 종목 B 슬롯 카드 */}
         <div
-          className={`md:col-span-5 p-6 rounded-3xl border transition-all relative ${
+          className={`md:col-span-5 p-6 rounded-3xl border transition-all relative border-l-4 ${
             finalWinner === 'B'
-              ? 'bg-gradient-to-b from-income-light/40 to-white border-income shadow-card ring-2 ring-income/20'
-              : 'bg-brand-bg border-subtle-border'
+              ? 'bg-gradient-to-b from-income-light/40 to-white border-income border-l-income shadow-card ring-2 ring-income/20'
+              : 'bg-brand-bg border-subtle-border border-l-brand-primary'
           }`}
         >
           {finalWinner === 'B' && (
-            <div className="absolute top-4 right-4 flex items-center gap-1 px-2.5 py-1 rounded-full bg-income text-white text-xs font-bold shadow-xs">
+            <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-income text-white text-xs font-black shadow-xs ring-2 ring-white">
               <Crown className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" />
-              <span>종합 우세 ({scoreB}승)</span>
+              <span>종합 판정 승리 ({scoreB}승)</span>
             </div>
           )}
 
           <div className="space-y-4">
             <div>
-              <label className="text-[11px] font-bold text-brand-muted uppercase tracking-wider block mb-1">
-                종목 B 선택 (Player B)
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-[11px] font-bold text-brand-muted uppercase tracking-wider flex items-center gap-1">
+                  <BarChart3 className="w-3.5 h-3.5 text-income" />
+                  종목 B 선택 (Player B)
+                </label>
+                <span className="text-[11px] font-mono text-brand-muted">우측 슬롯</span>
+              </div>
               <select
                 value={tickerB}
                 onChange={(e) => setTickerB(e.target.value)}
-                className="w-full px-3 py-2.5 bg-white rounded-xl border border-subtle-border font-extrabold text-sm text-brand-primary focus:outline-none focus:ring-2 focus:ring-income cursor-pointer shadow-2xs"
+                className="w-full px-3.5 py-2.5 bg-white rounded-xl border border-subtle-border font-extrabold text-sm text-brand-primary focus:outline-none focus:ring-2 focus:ring-income cursor-pointer shadow-2xs hover:border-income/40 transition-colors"
               >
                 {Object.entries(categorizedEtfs).map(([cat, list]) => (
                   <optgroup key={cat} label={`-- ${cat} --`}>
@@ -343,10 +353,10 @@ export default function EtfComparison() {
 
             <div>
               <div className="flex items-baseline gap-2">
-                <h3 className="text-3xl font-black tracking-tight text-brand-primary">
+                <h3 className="text-3xl font-black tracking-tight num-font text-brand-primary">
                   {etfB.ticker}
                 </h3>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-brand-secondary text-brand-primary font-bold">
+                <span className="text-xs px-2.5 py-0.5 rounded-md bg-brand-secondary text-brand-primary font-bold">
                   {etfB.category}
                 </span>
                 <span className="text-xs text-brand-muted font-mono">{etfB.frequencyLabel}</span>
@@ -357,21 +367,21 @@ export default function EtfComparison() {
             </div>
 
             <div className="pt-3 border-t border-subtle-border grid grid-cols-3 gap-2 text-center sm:text-left">
-              <div>
-                <span className="text-[10px] text-brand-muted block">현재가</span>
-                <span className="text-sm sm:text-base font-bold num-font text-brand-primary">
+              <div className="bg-white/80 p-2.5 rounded-xl border border-subtle-border/80">
+                <span className="text-[10px] text-brand-muted block font-medium">현재가</span>
+                <span className="text-sm sm:text-base font-black num-font text-brand-primary block mt-0.5">
                   ${etfB.currentPrice.toFixed(2)}
                 </span>
               </div>
-              <div>
-                <span className="text-[10px] text-brand-muted block">시가배당률</span>
-                <span className="text-sm sm:text-base font-bold num-font text-income">
+              <div className="bg-white/80 p-2.5 rounded-xl border border-income/30">
+                <span className="text-[10px] text-brand-muted block font-medium">시가배당률</span>
+                <span className="text-sm sm:text-base font-black num-font text-income block mt-0.5">
                   {(etfB.dividendYield * 100).toFixed(2)}%
                 </span>
               </div>
-              <div>
-                <span className="text-[10px] text-brand-muted block">5년 배당성장</span>
-                <span className="text-sm sm:text-base font-bold num-font text-brand-primary">
+              <div className="bg-white/80 p-2.5 rounded-xl border border-subtle-border/80">
+                <span className="text-[10px] text-brand-muted block font-medium">5년 배당성장</span>
+                <span className="text-sm sm:text-base font-black num-font text-brand-primary block mt-0.5">
                   {etfB.dividendGrowth5y ? `+${(etfB.dividendGrowth5y * 100).toFixed(1)}%` : '0.0%'}
                 </span>
               </div>
@@ -503,14 +513,14 @@ export default function EtfComparison() {
       </div>
 
       {/* 5. 핵심 결과 1: 골든크로스(배당 역전 시점) 하이라이트 배너 */}
-      <div className="p-6 rounded-3xl bg-gradient-to-r from-amber-500/15 via-amber-400/10 to-income/15 border-2 border-amber-400/40 space-y-3 shadow-sm">
+      <div className="p-6 rounded-3xl bg-gradient-to-r from-amber-500/10 via-amber-400/5 to-income/10 border border-amber-300/60 border-l-4 border-l-amber-500 space-y-3 shadow-card">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
             <Zap className="w-4 h-4 fill-amber-200 text-amber-200" />
           </div>
           <div>
             <span className="text-[11px] font-mono uppercase font-bold text-amber-900 tracking-wider">
-              Golden-Cross Intelligence
+              Golden-Cross Analytics
             </span>
             <h4 className="text-base sm:text-lg font-black text-brand-primary">
               배당금 역전(골든크로스) 판정 결과
@@ -518,17 +528,18 @@ export default function EtfComparison() {
           </div>
         </div>
 
-        <p className="text-base sm:text-lg font-extrabold text-brand-primary leading-relaxed bg-white/80 p-4 rounded-2xl border border-amber-300/60 shadow-2xs">
+        <p className="text-base sm:text-lg font-extrabold text-brand-primary leading-relaxed bg-white/90 p-4 rounded-2xl border border-amber-200/80 shadow-2xs">
           ⚡ {crossoverBattle.crossoverSummaryText}
         </p>
 
         {crossoverBattle.crossoverYear ? (
           <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-brand-primary font-medium">
-            <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-900 font-bold border border-amber-300/80">
-              📅 골든크로스 시점: 투자 후 {crossoverBattle.crossoverYear}년차
+            <span className="px-3 py-1 rounded-md bg-amber-100 text-amber-900 font-bold border border-amber-300/80 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+              골든크로스 시점: 투자 후 <span className="num-font font-black">{crossoverBattle.crossoverYear}년차</span>
             </span>
             <span className="text-brand-muted">
-              초기에는 고배당 ETF의 수령액이 많지만, 장기 복리 배당성장이 누적되며 배당금 그래프가 교차합니다.
+              초기에는 고배당 ETF의 수령액이 앞서지만, 장기 복리 배당성장률이 누적되며 배당금 그래프가 교차합니다.
             </span>
           </div>
         ) : (
@@ -543,27 +554,30 @@ export default function EtfComparison() {
         <div className="flex items-center gap-2">
           <Trophy className="w-5 h-5 text-income" />
           <h3 className="text-lg font-extrabold text-brand-primary">
-            ETF 맞짱 최종 승리 판정 배지 (Verdict)
+            ETF 맞짱 최종 승리 판정 대시보드 (Verdict)
           </h3>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* 1) 초기 5년 현금흐름 승자 */}
-          <div className="bg-gradient-to-br from-white to-income-light/30 rounded-3xl p-6 border-2 border-income/30 shadow-card space-y-4 relative overflow-hidden">
+          <div className="bg-white rounded-3xl p-6 border border-subtle-border border-l-4 border-l-income shadow-card hover:shadow-md transition-all space-y-4 relative overflow-hidden">
             <div className="flex items-center justify-between">
-              <span className="px-3 py-1 rounded-full bg-income text-white text-xs font-black flex items-center gap-1 shadow-2xs">
-                <Crown className="w-3.5 h-3.5 text-yellow-300 fill-yellow-300" />
-                초기 5년 현금흐름 승자
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-income-light text-income text-xs font-black shadow-2xs">
+                <Crown className="w-3.5 h-3.5 text-income fill-income/20" />
+                초기 5년 현금흐름 챔피언
               </span>
-              <span className="text-xs font-mono text-brand-muted">월급형 인컴</span>
+              <span className="text-xs font-mono text-brand-muted flex items-center gap-1">
+                <Wallet className="w-3.5 h-3.5 text-income" />
+                월급형 인컴
+              </span>
             </div>
 
             <div>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black text-brand-primary">
+                <span className="text-3xl font-black num-font tracking-tight text-brand-primary">
                   {crossoverBattle.winner5yCashflow.winnerTicker}
                 </span>
-                <span className="text-xs font-bold text-income">
+                <span className="text-xs font-bold text-income px-2 py-0.5 rounded bg-income-light/50">
                   5년 누적 배당 1위 👑
                 </span>
               </div>
@@ -573,15 +587,15 @@ export default function EtfComparison() {
             </div>
 
             <div className="pt-3 border-t border-subtle-border/80 grid grid-cols-2 gap-2 text-xs">
-              <div className="bg-white p-2.5 rounded-xl border border-subtle-border">
-                <span className="text-brand-muted block text-[11px]">{etfA.ticker} 5년 누적 배당</span>
-                <span className="font-extrabold num-font text-brand-primary">
+              <div className="bg-brand-bg p-3 rounded-xl border border-subtle-border">
+                <span className="text-brand-muted block text-[11px] font-medium">{etfA.ticker} 5년 누적 배당</span>
+                <span className="text-base font-black num-font text-brand-primary block mt-0.5">
                   {formatCurrency(crossoverBattle.winner5yCashflow.total5yKRW_A, 'KRW')}
                 </span>
               </div>
-              <div className="bg-white p-2.5 rounded-xl border border-subtle-border">
-                <span className="text-brand-muted block text-[11px]">{etfB.ticker} 5년 누적 배당</span>
-                <span className="font-extrabold num-font text-brand-primary">
+              <div className="bg-brand-bg p-3 rounded-xl border border-subtle-border">
+                <span className="text-brand-muted block text-[11px] font-medium">{etfB.ticker} 5년 누적 배당</span>
+                <span className="text-base font-black num-font text-brand-primary block mt-0.5">
                   {formatCurrency(crossoverBattle.winner5yCashflow.total5yKRW_B, 'KRW')}
                 </span>
               </div>
@@ -589,21 +603,24 @@ export default function EtfComparison() {
           </div>
 
           {/* 2) 10년 후 장기 총수익 승자 */}
-          <div className="bg-gradient-to-br from-white to-amber-500/10 rounded-3xl p-6 border-2 border-amber-400/40 shadow-card space-y-4 relative overflow-hidden">
+          <div className="bg-white rounded-3xl p-6 border border-subtle-border border-l-4 border-l-amber-500 shadow-card hover:shadow-md transition-all space-y-4 relative overflow-hidden">
             <div className="flex items-center justify-between">
-              <span className="px-3 py-1 rounded-full bg-amber-500 text-white text-xs font-black flex items-center gap-1 shadow-2xs">
-                <Trophy className="w-3.5 h-3.5 text-yellow-200 fill-yellow-200" />
-                10년 후 장기 총수익 승자
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-50 text-amber-700 text-xs font-black shadow-2xs border border-amber-200">
+                <Trophy className="w-3.5 h-3.5 text-amber-600 fill-amber-500/20" />
+                10년 후 장기 총수익 챔피언
               </span>
-              <span className="text-xs font-mono text-brand-muted">원금 + 누적배당</span>
+              <span className="text-xs font-mono text-brand-muted flex items-center gap-1">
+                <TrendingUp className="w-3.5 h-3.5 text-amber-600" />
+                원금 + 누적배당
+              </span>
             </div>
 
             <div>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black text-brand-primary">
+                <span className="text-3xl font-black num-font tracking-tight text-brand-primary">
                   {crossoverBattle.winner10yTotalReturn.winnerTicker}
                 </span>
-                <span className="text-xs font-bold text-amber-700">
+                <span className="text-xs font-bold text-amber-700 px-2 py-0.5 rounded bg-amber-50">
                   총 자산 증식 1위 🏆
                 </span>
               </div>
@@ -613,15 +630,15 @@ export default function EtfComparison() {
             </div>
 
             <div className="pt-3 border-t border-subtle-border/80 grid grid-cols-2 gap-2 text-xs">
-              <div className="bg-white p-2.5 rounded-xl border border-subtle-border">
-                <span className="text-brand-muted block text-[11px]">{etfA.ticker} 10년 후 총 자산</span>
-                <span className="font-extrabold num-font text-brand-primary">
+              <div className="bg-brand-bg p-3 rounded-xl border border-subtle-border">
+                <span className="text-brand-muted block text-[11px] font-medium">{etfA.ticker} 10년 후 총 자산</span>
+                <span className="text-base font-black num-font text-brand-primary block mt-0.5">
                   {formatCurrency(crossoverBattle.winner10yTotalReturn.totalWealth10yKRW_A, 'KRW')}
                 </span>
               </div>
-              <div className="bg-white p-2.5 rounded-xl border border-subtle-border">
-                <span className="text-brand-muted block text-[11px]">{etfB.ticker} 10년 후 총 자산</span>
-                <span className="font-extrabold num-font text-brand-primary">
+              <div className="bg-brand-bg p-3 rounded-xl border border-subtle-border">
+                <span className="text-brand-muted block text-[11px] font-medium">{etfB.ticker} 10년 후 총 자산</span>
+                <span className="text-base font-black num-font text-brand-primary block mt-0.5">
                   {formatCurrency(crossoverBattle.winner10yTotalReturn.totalWealth10yKRW_B, 'KRW')}
                 </span>
               </div>

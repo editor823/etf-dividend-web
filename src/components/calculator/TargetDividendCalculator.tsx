@@ -16,6 +16,9 @@ import {
   Check,
   ShieldCheck,
   RefreshCw,
+  Wallet,
+  Receipt,
+  Trophy,
 } from 'lucide-react';
 import {
   calculateTargetDividend,
@@ -43,6 +46,7 @@ export default function TargetDividendCalculator({ initialTicker }: TargetDivide
   const [selectedTicker, setSelectedTicker] = useState<string>(initialTicker || 'SCHD');
   const [monthlySharesToAdd, setMonthlySharesToAdd] = useState<number>(10); // 매월 10주 적립
   const [exchangeRate, setExchangeRate] = useState<number>(1350); // 기본 환율
+  const [currentSeedCapital, setCurrentSeedCapital] = useState<number>(10000000); // 현재 보유 시드머니 (기본 1,000만 원)
 
   // 실시간 시세 갱신 상태 관리
   const [liveQuotes, setLiveQuotes] = useState<Record<string, LiveQuote>>({});
@@ -550,52 +554,219 @@ export default function TargetDividendCalculator({ initialTicker }: TargetDivide
         </div>
       </div>
 
-      {/* 3. 중앙 하이라이트 결과 카드 (필요 주식 수 & 필요 총 자본금) */}
-      <div className="bg-gradient-to-br from-brand-primary to-brand-dark rounded-3xl p-6 sm:p-8 text-white shadow-elevated relative overflow-hidden">
-        <div className="absolute -right-12 -bottom-12 w-64 h-64 rounded-full bg-income/10 blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-          {/* 필요 총 주식 수 */}
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-income-light text-xs font-semibold backdrop-blur-sm">
-              <CheckCircle2 className="w-3.5 h-3.5 text-income-light" />
-              목표 달성에 필요한 총 주식 수
-            </div>
-            <div className="flex items-baseline gap-3">
-              <span className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight num-font text-white">
-                {formatNumber(result.requiredShares)}
-              </span>
-              <span className="text-2xl font-bold text-white/70">주</span>
-            </div>
-            <p className="text-xs sm:text-sm text-white/70 leading-relaxed">
-              1주당 연간 세후 배당금:{' '}
-              <span className="num-font text-white font-bold">
-                ${result.netDividendPerShareAnnualUSD.toFixed(2)}
-              </span>{' '}
-              (미국 원천징수세 {formatPercent(US_DIVIDEND_TAX_RATE, 0)} 차감 후)
-            </p>
-          </div>
-
-          {/* 현재가 기준 필요 총 원금 */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/15 space-y-3">
-            <span className="text-xs uppercase font-mono tracking-wider text-white/70">
-              현재가 기준 필요 투자 원금
+      {/* 3. Tremor 스타일 금융 애널리틱스 메트릭 카드 3종 세트 */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* 카드 1: 필요 총 주식 수 */}
+        <div className="bg-white rounded-2xl p-5 border-l-4 border-l-income border border-subtle-border shadow-card hover:shadow-md transition-all space-y-2 group">
+          <div className="flex items-center justify-between text-xs text-brand-muted">
+            <span className="font-bold text-brand-primary flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4 text-income" />
+              필요 총 주식 수
             </span>
-            <div className="space-y-1">
-              <div className="text-3xl sm:text-4xl font-extrabold num-font text-white">
-                {formatCurrency(result.totalCapitalKRW, 'KRW')}
-              </div>
-              <div className="text-sm font-semibold num-font text-white/80">
-                약 {formatCurrency(result.totalCapitalUSD, 'USD')}
-              </div>
+            <span className="px-2 py-0.5 rounded-full bg-income-light text-income font-extrabold text-[10px]">
+              목표 주수
+            </span>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-3xl sm:text-4xl font-black tracking-tight num-font text-brand-primary">
+              {formatNumber(result.requiredShares)}
+            </span>
+            <span className="text-base font-bold text-brand-muted">주</span>
+          </div>
+          <p className="text-[11px] text-brand-muted pt-2 border-t border-subtle-border/60">
+            1주당 연간 세후 배당금:{' '}
+            <strong className="text-brand-primary num-font">
+              ${result.netDividendPerShareAnnualUSD.toFixed(2)}
+            </strong>{' '}
+            (15% 배당세 차감 후)
+          </p>
+        </div>
+
+        {/* 카드 2: 필요 총 투자 원금 */}
+        <div className="bg-white rounded-2xl p-5 border-l-4 border-l-indigo-500 border border-subtle-border shadow-card hover:shadow-md transition-all space-y-2 group">
+          <div className="flex items-center justify-between text-xs text-brand-muted">
+            <span className="font-bold text-brand-primary flex items-center gap-1.5">
+              <Wallet className="w-4 h-4 text-indigo-500" />
+              필요 총 투자 원금
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-extrabold text-[10px] border border-indigo-200">
+              현재가 기준
+            </span>
+          </div>
+          <div>
+            <div className="text-2xl sm:text-3xl font-black tracking-tight num-font text-brand-primary">
+              {formatCurrency(result.totalCapitalKRW, 'KRW')}
             </div>
-            <div className="text-[11px] text-white/60 pt-2 border-t border-white/10 flex items-center justify-between">
-              <span>적용 주가: ${result.etf.currentPrice.toFixed(2)}</span>
-              <span>환율: ₩{formatNumber(result.exchangeRate)}</span>
+            <div className="text-xs font-semibold num-font text-indigo-600 mt-0.5">
+              약 {formatCurrency(result.totalCapitalUSD, 'USD')}
             </div>
           </div>
+          <p className="text-[11px] text-brand-muted pt-2 border-t border-subtle-border/60 flex justify-between">
+            <span>적용주가: ${result.etf.currentPrice.toFixed(2)}</span>
+            <span>환율: ₩{formatNumber(result.exchangeRate)}</span>
+          </p>
+        </div>
+
+        {/* 카드 3: 연간 세후 배당 실수령액 */}
+        <div className="bg-white rounded-2xl p-5 border-l-4 border-l-amber-500 border border-subtle-border shadow-card hover:shadow-md transition-all space-y-2 group">
+          <div className="flex items-center justify-between text-xs text-brand-muted">
+            <span className="font-bold text-brand-primary flex items-center gap-1.5">
+              <Receipt className="w-4 h-4 text-amber-500" />
+              연간 세후 배당 총액
+            </span>
+            <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 font-extrabold text-[10px] border border-amber-200">
+              순수 통장 수령액
+            </span>
+          </div>
+          <div>
+            <div className="text-2xl sm:text-3xl font-black tracking-tight num-font text-income">
+              {formatCurrency(result.monthlyNetDividendKRW * 12, 'KRW')}
+            </div>
+            <div className="text-xs font-semibold num-font text-brand-muted mt-0.5">
+              월 세후 {formatCurrency(result.monthlyNetDividendKRW, 'KRW')}
+            </div>
+          </div>
+          <p className="text-[11px] text-brand-muted pt-2 border-t border-subtle-border/60 flex justify-between">
+            <span>실효 배당률: {formatPercent(activeEtf.dividendYield * (1 - US_DIVIDEND_TAX_RATE))}</span>
+            <span>지급: {activeEtf.payoutCycle || activeEtf.frequencyLabel}</span>
+          </p>
         </div>
       </div>
+
+      {/* 3-1. Tremor 인터랙티브 프로그레스 바 대시보드 (내 시드머니 목표 달성률 게이지) */}
+      {(() => {
+        const seedRatio =
+          result.totalCapitalKRW > 0
+            ? Math.min(100, Math.round((currentSeedCapital / result.totalCapitalKRW) * 1000) / 10)
+            : 0;
+        const currentMonthlyFromSeed = Math.round(
+          (Math.min(currentSeedCapital, result.totalCapitalKRW) / result.totalCapitalKRW) *
+            targetAmount
+        );
+        const remainingCapital = Math.max(0, result.totalCapitalKRW - currentSeedCapital);
+
+        const quickSeeds = [
+          { label: '0원', value: 0 },
+          { label: '1,000만', value: 10000000 },
+          { label: '3,000만', value: 30000000 },
+          { label: '5,000만', value: 50000000 },
+          { label: '1억 원', value: 100000000 },
+        ];
+
+        return (
+          <div className="bg-gradient-to-br from-slate-900 via-brand-primary to-brand-dark rounded-3xl p-6 sm:p-7 text-white shadow-elevated space-y-5 relative overflow-hidden">
+            <div className="absolute -right-10 -bottom-10 w-60 h-60 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* 헤더 & 달성 뱃지 */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-sm border border-emerald-400/30">
+                  <Trophy className="w-4 h-4 text-emerald-400" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-extrabold text-white flex items-center gap-2">
+                    <span>내 시드머니 목표 달성률 게이지</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500 text-white shadow-2xs">
+                      {seedRatio >= 100
+                        ? '🎉 목표 초과 달성!'
+                        : seedRatio >= 50
+                        ? '🚀 절반 돌파 완료'
+                        : seedRatio >= 25
+                        ? '🔥 25% 돌파 순항 중'
+                        : '🌱 착수 단계'}
+                    </span>
+                  </h4>
+                  <p className="text-xs text-white/70 mt-0.5">
+                    현재 내가 보유한 시드머니를 입력하면 월 목표 배당 중 얼마를 이미 달성했는지 실시간으로 계산합니다.
+                  </p>
+                </div>
+              </div>
+
+              {/* 시드머니 퀵 칩 */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {quickSeeds.map((chip) => (
+                  <button
+                    key={chip.label}
+                    type="button"
+                    onClick={() => setCurrentSeedCapital(chip.value)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      currentSeedCapital === chip.value
+                        ? 'bg-emerald-400 text-slate-950 shadow-xs'
+                        : 'bg-white/10 hover:bg-white/20 text-white/80'
+                    }`}
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 인터랙티브 게이지 바 (Progress Bar) */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-baseline text-xs">
+                <span className="text-white/80 font-medium">
+                  현재 보유 시드머니:{' '}
+                  <strong className="text-white num-font font-bold">
+                    {formatCurrency(currentSeedCapital, 'KRW')}
+                  </strong>
+                </span>
+                <span className="font-black text-emerald-300 num-font text-base sm:text-lg">
+                  달성률 {seedRatio.toFixed(1)}%
+                </span>
+              </div>
+
+              {/* 프로그레스 트랙 & 필 */}
+              <div className="w-full bg-white/10 rounded-full h-3.5 p-0.5 overflow-hidden backdrop-blur-sm border border-white/10">
+                <div
+                  className="h-full bg-gradient-to-r from-emerald-400 via-teal-300 to-indigo-400 rounded-full transition-all duration-700 ease-out shadow-xs"
+                  style={{ width: `${Math.min(100, Math.max(3, seedRatio))}%` }}
+                />
+              </div>
+
+              <div className="flex justify-between text-[11px] text-white/60 num-font pt-0.5">
+                <span>0% (0원)</span>
+                <span>25%</span>
+                <span>50%</span>
+                <span>75%</span>
+                <span>100% ({formatCurrency(result.totalCapitalKRW, 'KRW')})</span>
+              </div>
+            </div>
+
+            {/* 시드머니 조절 슬라이더 및 성과 요약 */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 pt-1 items-center">
+              <div className="md:col-span-7 space-y-1.5">
+                <label className="text-[11px] text-white/70 block">
+                  시드머니 슬라이더로 조절 (0원 ~ 필요 총 원금):
+                </label>
+                <input
+                  type="range"
+                  min="0"
+                  max={Math.max(100000000, result.totalCapitalKRW)}
+                  step="1000000"
+                  value={currentSeedCapital}
+                  onChange={(e) => setCurrentSeedCapital(Number(e.target.value))}
+                  className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-emerald-400"
+                />
+              </div>
+
+              <div className="md:col-span-5 bg-white/10 backdrop-blur-md p-3.5 rounded-2xl border border-white/15 space-y-1 text-xs">
+                <div className="flex justify-between items-center text-white/80">
+                  <span>내 시드로 즉시 확보된 월배당:</span>
+                  <span className="font-extrabold text-emerald-300 num-font text-sm">
+                    월 {formatCurrency(currentMonthlyFromSeed, 'KRW')}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-white/60 text-[11px] pt-1 border-t border-white/10">
+                  <span>100% 달성까지 남은 원금:</span>
+                  <span className="font-bold text-white num-font">
+                    {formatCurrency(remainingCapital, 'KRW')}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* 4) 연간 세전 배당금 2,000만 원 초과 시 경고 뱃지 */}
       {isComprehensiveTaxExceeded ? (

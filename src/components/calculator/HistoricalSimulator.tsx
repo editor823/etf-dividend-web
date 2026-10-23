@@ -11,6 +11,7 @@ import {
   Wallet,
   CalendarDays,
   CheckCircle2,
+  PiggyBank,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -345,98 +346,114 @@ export default function HistoricalSimulator() {
         </div>
       </div>
 
-      {/* 3. 백테스트 핵심 결과 카드 4종 (Metrics Cards) */}
+      {/* 3. 백테스트 핵심 결과 카드 4종 (Tremor Financial Metrics Cards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* 카드 1: 현재 총 평가 자산 */}
-        <div className="bg-gradient-to-br from-brand-primary to-brand-dark text-white rounded-2xl p-5 shadow-card space-y-2 relative overflow-hidden">
-          <div className="flex items-center justify-between text-xs text-white/70">
-            <span className="font-medium">1. 현재 총 평가 자산</span>
-            <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-income text-white text-[10px] font-bold">
+        <div className="bg-white rounded-2xl p-5 border border-subtle-border border-l-4 border-l-income shadow-card hover:shadow-md transition-all space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-brand-muted flex items-center gap-1.5">
+              <TrendingUp className="w-3.5 h-3.5 text-income" />
+              1. 현재 총 평가 자산
+            </span>
+            <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-income-light text-income text-[11px] font-bold">
               <ArrowUpRight className="w-3 h-3" />
               {result.totalReturnRate >= 0 ? '+' : ''}
               {formatPercent(result.totalReturnRate, 1)}
             </span>
           </div>
           <div>
-            <div className="text-2xl sm:text-3xl font-black num-font">
+            <div className="text-2xl sm:text-3xl font-black num-font tracking-tight text-brand-primary">
               {formatCurrency(result.currentTotalAssetKRW, 'KRW')}
             </div>
-            <p className="text-xs text-white/80 num-font mt-0.5">
-              순수익: +{formatCurrency(result.totalProfitKRW, 'KRW')}
+            <p className="text-xs text-brand-muted num-font mt-0.5">
+              순수익: <span className="text-income font-bold">+{formatCurrency(result.totalProfitKRW, 'KRW')}</span>
             </p>
           </div>
-          <div className="text-[11px] text-white/60 pt-2 border-t border-white/10 flex items-center justify-between">
+          <div className="text-[11px] text-brand-muted pt-2 border-t border-subtle-border/80 flex items-center justify-between">
             <span>연평균 복리 (CAGR)</span>
-            <span className="num-font font-bold text-income-light">
+            <span className="num-font font-black text-income">
               +{formatPercent(result.cagr, 1)}
             </span>
           </div>
         </div>
 
         {/* 카드 2: 총 납입 원금 */}
-        <div className="bg-white rounded-2xl p-5 border border-subtle-border shadow-card space-y-2">
-          <div className="flex items-center justify-between text-xs text-brand-muted">
-            <span className="font-medium">2. 총 납입 원금</span>
-            <Wallet className="w-4 h-4 text-brand-muted" />
+        <div className="bg-white rounded-2xl p-5 border border-subtle-border border-l-4 border-l-slate-600 shadow-card hover:shadow-md transition-all space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-brand-muted flex items-center gap-1.5">
+              <Wallet className="w-3.5 h-3.5 text-slate-600" />
+              2. 총 납입 원금
+            </span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[11px] font-bold">
+              {result.periodMonths}회 분할
+            </span>
           </div>
           <div>
-            <div className="text-2xl font-bold num-font text-brand-primary">
+            <div className="text-2xl sm:text-3xl font-black num-font tracking-tight text-brand-primary">
               {formatCurrency(result.totalPrincipalKRW, 'KRW')}
             </div>
-            <p className="text-xs text-brand-muted mt-0.5">
+            <p className="text-xs text-brand-muted mt-0.5 truncate">
               초기 {formatManwon(initialCapitalKRW)} + 매월 적립 누적
             </p>
           </div>
-          <div className="text-[11px] text-brand-muted pt-2 border-t border-subtle-border flex items-center justify-between">
+          <div className="text-[11px] text-brand-muted pt-2 border-t border-subtle-border/80 flex items-center justify-between">
             <span>총 납입 횟수</span>
-            <span className="font-semibold text-brand-primary num-font">
-              {result.periodMonths}회 납입
+            <span className="font-bold text-brand-primary num-font">
+              {result.periodMonths}개월 연속 적립
             </span>
           </div>
         </div>
 
         {/* 카드 3: 현재 월 세후 배당 실수령액 */}
-        <div className="bg-white rounded-2xl p-5 border border-subtle-border shadow-card space-y-2">
-          <div className="flex items-center justify-between text-xs text-brand-muted">
-            <span className="font-medium">3. 현재 월 세후 배당 실수령액</span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-income-light text-income font-bold">
-              15% 세금 차감
+        <div className="bg-white rounded-2xl p-5 border border-subtle-border border-l-4 border-l-emerald-600 shadow-card hover:shadow-md transition-all space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-brand-muted flex items-center gap-1.5">
+              <Coins className="w-3.5 h-3.5 text-emerald-600" />
+              3. 현재 월 세후 실수령액
+            </span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-200">
+              15.4% 세후
             </span>
           </div>
           <div>
-            <div className="text-2xl font-bold num-font text-income">
+            <div className="text-2xl sm:text-3xl font-black num-font tracking-tight text-income">
               +{formatCurrency(result.currentMonthlyDividendKRW, 'KRW')}
               <span className="text-xs text-brand-muted font-normal"> / 월</span>
             </div>
             <p className="text-xs text-brand-muted num-font mt-0.5">
-              연간 실수령: 약 {formatCurrency(result.currentAnnualDividendKRW, 'KRW')}
+              연간 환산: 약 {formatCurrency(result.currentAnnualDividendKRW, 'KRW')}
             </p>
           </div>
-          <div className="text-[11px] text-brand-muted pt-2 border-t border-subtle-border flex items-center justify-between">
+          <div className="text-[11px] text-brand-muted pt-2 border-t border-subtle-border/80 flex items-center justify-between">
             <span>최종 보유 주식수</span>
-            <span className="font-bold text-brand-primary num-font">
+            <span className="font-black text-brand-primary num-font">
               {formatNumber(result.endingShares, 1)}주
             </span>
           </div>
         </div>
 
         {/* 카드 4: 누적 수령 배당금 총액 */}
-        <div className="bg-white rounded-2xl p-5 border border-subtle-border shadow-card space-y-2">
-          <div className="flex items-center justify-between text-xs text-brand-muted">
-            <span className="font-medium">4. 누적 수령 배당금 총액</span>
-            <Coins className="w-4 h-4 text-income" />
+        <div className="bg-white rounded-2xl p-5 border border-subtle-border border-l-4 border-l-amber-500 shadow-card hover:shadow-md transition-all space-y-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-brand-muted flex items-center gap-1.5">
+              <PiggyBank className="w-3.5 h-3.5 text-amber-600" />
+              4. 누적 수령 배당 총액
+            </span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 text-[11px] font-bold border border-amber-200">
+              {periodYears}년 누적
+            </span>
           </div>
           <div>
-            <div className="text-2xl font-bold num-font text-brand-primary">
+            <div className="text-2xl sm:text-3xl font-black num-font tracking-tight text-brand-primary">
               +{formatCurrency(result.accumulatedDividendsKRW, 'KRW')}
             </div>
             <p className="text-xs text-brand-muted mt-0.5">
               과거 {periodYears}년 동안 꽂힌 총 배당금
             </p>
           </div>
-          <div className="text-[11px] text-brand-muted pt-2 border-t border-subtle-border flex items-center justify-between">
+          <div className="text-[11px] text-brand-muted pt-2 border-t border-subtle-border/80 flex items-center justify-between">
             <span>원금 대비 배당률 (YoC)</span>
-            <span className="font-bold text-income num-font">
+            <span className="font-black text-income num-font">
               연 {result.yieldOnCost.toFixed(1)}%
             </span>
           </div>
