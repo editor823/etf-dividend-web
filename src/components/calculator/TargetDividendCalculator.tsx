@@ -15,6 +15,7 @@ import {
   AlertTriangle,
   Check,
   ShieldCheck,
+  RefreshCw,
 } from 'lucide-react';
 import {
   calculateTargetDividend,
@@ -23,6 +24,12 @@ import {
 } from '@/lib/calculator/target-dividend';
 import { ETF_LIST, ETF_MAP, ETFCategory } from '@/data/etfList';
 import { formatCurrency, formatPercent, formatNumber } from '@/lib/utils';
+import {
+  fetchLiveQuotes,
+  getCachedQuotes,
+  mergeQuotesWithEtfList,
+  LiveQuote,
+} from '@/lib/services/realtime-quotes';
 import TargetDividendGuide from './guides/TargetDividendGuide';
 
 interface TargetDividendCalculatorProps {
@@ -37,12 +44,54 @@ export default function TargetDividendCalculator({ initialTicker }: TargetDivide
   const [monthlySharesToAdd, setMonthlySharesToAdd] = useState<number>(10); // 매월 10주 적립
   const [exchangeRate, setExchangeRate] = useState<number>(1350); // 기본 환율
 
+  // 실시간 시세 갱신 상태 관리
+  const [liveQuotes, setLiveQuotes] = useState<Record<string, LiveQuote>>({});
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [lastUpdatedText, setLastUpdatedText] = useState<string>('1시간 전 기준');
+  const [refreshToast, setRefreshToast] = useState<string | null>(null);
+
+  // 로컬 캐시 확인 및 초기 로드
+  React.useEffect(() => {
+    const cached = getCachedQuotes();
+    if (cached && Object.keys(cached.data).length > 0) {
+      setLiveQuotes(cached.data);
+      setLastUpdatedText(`${cached.updatedAt} 기준`);
+    }
+  }, []);
+
+  // 실시간 시세 갱신 버튼 클릭 핸들러
+  const handleRefreshQuotes = async () => {
+    setIsRefreshing(true);
+    setRefreshToast(null);
+    try {
+      const result = await fetchLiveQuotes(undefined, true);
+      setLiveQuotes(result.data);
+      setLastUpdatedText(`${result.updatedAt} 기준`);
+      setRefreshToast('✅ 최신 실시간 주가와 배당률이 계산기에 반영되었습니다.');
+      setTimeout(() => setRefreshToast(null), 3500);
+    } catch {
+      setRefreshToast('⚠️ 실시간 시세 갱신 중 네트워크 지연이 발생했습니다.');
+      setTimeout(() => setRefreshToast(null), 3500);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   // 외부(AI 검색 추천 등)에서 initialTicker 변경 시 동기화
   React.useEffect(() => {
     if (initialTicker && ETF_MAP[initialTicker]) {
       setSelectedTicker(initialTicker);
     }
   }, [initialTicker]);
+
+  // 실시간 시세가 병합된 ETF 목록 및 맵
+  const activeEtfList = useMemo(() => {
+    return mergeQuotesWithEtfList(ETF_LIST, liveQuotes);
+  }, [liveQuotes]);
+
+  const activeEtfMap = useMemo(() => {
+    return Object.fromEntries(activeEtfList.map((item) => [item.ticker, item]));
+  }, [activeEtfList]);
 
   // 1) 카테고리 필터 및 검색창 상태
   const [selectedCategory, setSelectedCategory] = useState<ETFCategory>('전체');
@@ -84,20 +133,25 @@ export default function TargetDividendCalculator({ initialTicker }: TargetDivide
     setCurrency(newCurrency);
   };
 
-  // 연산 수행 (메모이제이션)
+  // 현재 활성화된 ETF 정보 (실시간 시세 우선 반영)
+  const activeEtf =
+    activeEtfMap[selectedTicker] ||
+    ETF_MAP[selectedTicker] ||
+    POPULAR_ETFS[selectedTicker] ||
+    ETF_LIST[0];
+
+  // 연산 수행 (메모이제이션 - 실시간 주가 및 배당수익률 반영)
   const result = useMemo(() => {
     return calculateTargetDividend({
       targetMonthlyAmount: targetAmount,
       currency,
       ticker: selectedTicker,
+      customPrice: activeEtf.currentPriceUSD,
+      customYield: activeEtf.dividendYield,
       monthlySharesToAdd,
       exchangeRate,
     });
-  }, [targetAmount, currency, selectedTicker, monthlySharesToAdd, exchangeRate]);
-
-  // 현재 활성화된 ETF 정보
-  const activeEtf =
-    ETF_MAP[selectedTicker] || POPULAR_ETFS[selectedTicker] || ETF_LIST[0];
+  }, [targetAmount, currency, selectedTicker, activeEtf, monthlySharesToAdd, exchangeRate]);
 
   // 연간 세전 배당금 (원화 환산)
   const annualGrossDividendKRW =
@@ -105,9 +159,9 @@ export default function TargetDividendCalculator({ initialTicker }: TargetDivide
   // 금융소득 종합과세 기준: 연 2,000만 원 초과 여부
   const isComprehensiveTaxExceeded = annualGrossDividendKRW > 20000000;
 
-  // 3) 검색 및 카테고리에 맞게 실시간 필터링된 20개 종목 목록
+  // 3) 검색 및 카테고리에 맞게 실시간 필터링된 20개 종목 목록 (실시간 시세 반영)
   const filteredEtfs = useMemo(() => {
-    return ETF_LIST.filter((etf) => {
+    return activeEtfList.filter((etf) => {
       const matchCategory =
         selectedCategory === '전체' ||
         etf.category === selectedCategory ||
@@ -120,7 +174,7 @@ export default function TargetDividendCalculator({ initialTicker }: TargetDivide
         etf.nameEn.toLowerCase().includes(q);
       return matchCategory && matchSearch;
     });
-  }, [selectedCategory, searchQuery]);
+  }, [activeEtfList, selectedCategory, searchQuery]);
 
   return (
     <div className="w-full bg-white rounded-3xl border border-subtle-border shadow-elevated p-6 sm:p-8 lg:p-10 space-y-8">
@@ -231,15 +285,49 @@ export default function TargetDividendCalculator({ initialTicker }: TargetDivide
 
           {/* ★ 작업 2 핵심: 20개 종목 선택 영역 전면 개편 ★ */}
           <div className="space-y-3 pt-3 border-t border-subtle-border">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <label className="text-sm font-bold text-brand-primary flex items-center gap-1.5">
                 <TrendingUp className="w-4 h-4 text-income" />
                 <span>투자 대상 ETF 선택 (20개 대표 종목)</span>
               </label>
-              <span className="text-xs text-brand-muted font-mono">
-                {filteredEtfs.length}개 종목 표시 중
-              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleRefreshQuotes}
+                  disabled={isRefreshing}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 text-xs font-semibold text-brand-muted hover:text-brand-primary transition-all cursor-pointer disabled:opacity-50"
+                  title="야후 파이낸스 실시간 시세 및 최신 배당률 동기화"
+                >
+                  <RefreshCw
+                    className={`w-3.5 h-3.5 ${
+                      isRefreshing ? 'animate-spin text-income' : 'text-gray-500'
+                    }`}
+                  />
+                  <span>
+                    {isRefreshing
+                      ? '시세 갱신 중...'
+                      : `🔄 실시간 시세 갱신 (${lastUpdatedText})`}
+                  </span>
+                </button>
+                <span className="text-xs text-brand-muted font-mono hidden sm:inline">
+                  {filteredEtfs.length}개 종목
+                </span>
+              </div>
             </div>
+
+            {/* 갱신 안내 토스트 알림 */}
+            {refreshToast && (
+              <div className="p-2.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-200 flex items-center justify-between animate-in fade-in duration-200">
+                <span>{refreshToast}</span>
+                <button
+                  type="button"
+                  onClick={() => setRefreshToast(null)}
+                  className="text-emerald-700 hover:text-emerald-900 p-0.5"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
 
             {/* 1) 상단 [전체 / 배당성장 / 월배당·커버드콜 / 시장지수 / 리츠·채권] 카테고리 필터 탭 */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
