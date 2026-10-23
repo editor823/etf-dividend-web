@@ -25,6 +25,7 @@ import DividendCalendar from '@/components/calculator/DividendCalendar';
 import QuickGuideModal from '@/components/calculator/QuickGuideModal';
 import SavePortfolioModal from '@/components/auth/SavePortfolioModal';
 import AdminDashboardModal from '@/components/admin/AdminDashboardModal';
+import SemanticSearchHero from '@/components/search/SemanticSearchHero';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import AdBannerSlot from '@/components/ads/AdBannerSlot';
@@ -33,6 +34,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<
     'reverse' | 'compare' | 'timemachine' | 'barbell' | 'drip' | 'calendar'
   >('reverse');
+  const [selectedCalculatorTicker, setSelectedCalculatorTicker] = useState<string>('SCHD');
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
@@ -41,6 +43,16 @@ export default function Home() {
     tab: 'reverse' | 'compare' | 'timemachine' | 'barbell' | 'drip' | 'calendar'
   ) => {
     setActiveTab(tab);
+    const el = document.getElementById('interactive-tools');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // AI 시맨틱 검색 등에서 ETF를 선택했을 때 역산기로 즉시 반영 및 스크롤
+  const handleSelectEtfForCalculator = (ticker: string) => {
+    setSelectedCalculatorTicker(ticker);
+    setActiveTab('reverse');
     const el = document.getElementById('interactive-tools');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
@@ -241,12 +253,19 @@ export default function Home() {
               🔥 서학 vs 동학 인기 랭킹
             </Link>
           </div>
+
+          {/* AI 자연어 시맨틱 맞춤 검색 섹션 */}
+          <div className="pt-4">
+            <SemanticSearchHero onSelectEtfForCalculator={handleSelectEtfForCalculator} />
+          </div>
         </div>
 
         {/* 인터랙티브 탭 & 툴 섹션 (상단 스티키 헤더 탭과 일원화되어 중복 탭 박스 없이 전용 뷰 직접 표시) */}
         <section id="interactive-tools" className="scroll-mt-28">
           <div>
-            {activeTab === 'reverse' && <TargetDividendCalculator />}
+            {activeTab === 'reverse' && (
+              <TargetDividendCalculator initialTicker={selectedCalculatorTicker} />
+            )}
             {activeTab === 'compare' && <EtfComparison />}
             {activeTab === 'timemachine' && <HistoricalSimulator />}
             {activeTab === 'barbell' && <BarbellOptimizer />}

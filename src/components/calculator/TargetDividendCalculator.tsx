@@ -25,13 +25,24 @@ import { ETF_LIST, ETF_MAP, ETFCategory } from '@/data/etfList';
 import { formatCurrency, formatPercent, formatNumber } from '@/lib/utils';
 import TargetDividendGuide from './guides/TargetDividendGuide';
 
-export default function TargetDividendCalculator() {
+interface TargetDividendCalculatorProps {
+  initialTicker?: string;
+}
+
+export default function TargetDividendCalculator({ initialTicker }: TargetDividendCalculatorProps = {}) {
   // 상태 관리
   const [currency, setCurrency] = useState<'KRW' | 'USD'>('KRW');
   const [targetAmount, setTargetAmount] = useState<number>(1000000); // 기본 100만 원
-  const [selectedTicker, setSelectedTicker] = useState<string>('SCHD');
+  const [selectedTicker, setSelectedTicker] = useState<string>(initialTicker || 'SCHD');
   const [monthlySharesToAdd, setMonthlySharesToAdd] = useState<number>(10); // 매월 10주 적립
   const [exchangeRate, setExchangeRate] = useState<number>(1350); // 기본 환율
+
+  // 외부(AI 검색 추천 등)에서 initialTicker 변경 시 동기화
+  React.useEffect(() => {
+    if (initialTicker && ETF_MAP[initialTicker]) {
+      setSelectedTicker(initialTicker);
+    }
+  }, [initialTicker]);
 
   // 1) 카테고리 필터 및 검색창 상태
   const [selectedCategory, setSelectedCategory] = useState<ETFCategory>('전체');
