@@ -15,6 +15,7 @@ import {
   Menu,
   X,
   Lightbulb,
+  Flame,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/auth-context';
 
@@ -139,6 +140,14 @@ export default function Header({
             >
               <Info className="w-3.5 h-3.5" />
               <span>사이트 소개</span>
+            </Link>
+
+            <Link
+              href="/#etf-rankings"
+              className="px-3 py-1.5 rounded-xl text-xs font-bold text-orange-700 bg-orange-50 hover:bg-orange-100/80 transition-all flex items-center gap-1.5 border border-orange-200/60 shadow-2xs"
+            >
+              <Flame className="w-3.5 h-3.5 text-orange-600" />
+              <span>서학·동학 랭킹</span>
             </Link>
 
             {onOpenGuideModal && (
@@ -302,6 +311,20 @@ export default function Header({
                 <span>플랫폼 및 운영진 소개 (About)</span>
               </span>
               <span className="text-[10px] text-brand-muted">E-E-A-T</span>
+            </Link>
+
+            <Link
+              href="/#etf-rankings"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between p-3 rounded-xl text-xs font-bold bg-orange-50/80 border border-orange-200/80 text-orange-900 hover:bg-orange-100/80 transition-colors shadow-2xs"
+            >
+              <span className="flex items-center gap-2">
+                <Flame className="w-4 h-4 text-orange-600" />
+                <span>🔥 서학 vs 동학 ETF 인기 랭킹</span>
+              </span>
+              <span className="text-[10px] bg-orange-500 text-white font-bold px-2 py-0.5 rounded-full font-mono">
+                TOP 7
+              </span>
             </Link>
 
             {onOpenGuideModal && (

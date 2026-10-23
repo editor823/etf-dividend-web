@@ -1,14 +1,18 @@
 import { ETF_DATABASE, ETFMasterData } from '@/lib/data/etf-database';
+import { ETF_MAP, ETFItem } from '@/data/etfList';
 
 /**
  * ETF 기본 정보 인터페이스 (확장 마스터 데이터 모델 연동)
  */
-export type ETFInfo = ETFMasterData;
+export type ETFInfo = ETFMasterData | ETFItem;
 
 /**
- * 기본 제공되는 17종 핵심 미국 배당 및 지수 ETF/주식 데이터셋
+ * 기본 제공되는 20종 핵심 미국 배당 및 지수 ETF/주식 데이터셋
  */
-export const POPULAR_ETFS: Record<string, ETFInfo> = ETF_DATABASE;
+export const POPULAR_ETFS: Record<string, ETFInfo> = {
+  ...ETF_DATABASE,
+  ...ETF_MAP,
+};
 
 /**
  * 계산기 입력 파라미터

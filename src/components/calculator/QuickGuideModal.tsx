@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   Lightbulb,
@@ -32,6 +32,17 @@ export default function QuickGuideModal({
   const [selectedTool, setSelectedTool] = useState<
     'reverse' | 'compare' | 'timemachine' | 'barbell' | 'drip' | 'calendar'
   >(defaultTab);
+
+  // 모달이 열려있을 때 뒷배경(바탕화면) 마우스 휠 스크롤 방지
+  useEffect(() => {
+    if (!isOpen) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -253,7 +264,7 @@ export default function QuickGuideModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto overscroll-contain">
       {/* 백드롭 오버레이 */}
       <div
         className="fixed inset-0 bg-brand-primary/60 backdrop-blur-xs transition-opacity animate-in fade-in"
@@ -325,7 +336,7 @@ export default function QuickGuideModal({
         </div>
 
         {/* 탭 본문 내용 (스크롤 영역) */}
-        <div className="p-6 sm:p-8 overflow-y-auto space-y-6">
+        <div className="p-6 sm:p-8 overflow-y-auto overscroll-contain space-y-6">
           {/* 타이틀 및 핵심 질문 */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-subtle-border pb-5">
             <div className="space-y-1">

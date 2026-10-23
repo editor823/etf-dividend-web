@@ -50,6 +50,7 @@ export interface CalendarPreset {
   name: string;
   description: string;
   portfolio: Record<string, number>; // { SCHD: 200, JEPI: 300 }
+  weights: Record<string, number>; // { SCHD: 0.40, JEPI: 0.35, JEPQ: 0.25 }
 }
 
 /**
@@ -90,23 +91,74 @@ export const TICKER_SCHEDULES: Record<string, TickerDividendSchedule> = Object.f
 export const CALENDAR_PRESETS: CalendarPreset[] = [
   {
     id: 'monthly_salary',
-    name: '황금 월급형 (SCHD+JEPI+JEPQ)',
+    name: '황금 월급형 (SCHD 40% + JEPI 35% + JEPQ 25%)',
     description: '매월 1일 고인컴 월배당 + 분기말(3,6,9,12월) 보너스 배당이 쏟아지는 빈틈없는 현금흐름 포트폴리오',
     portfolio: { SCHD: 200, JEPI: 300, JEPQ: 200 },
+    weights: { SCHD: 0.40, JEPI: 0.35, JEPQ: 0.25 },
   },
   {
     id: 'growth_focus',
-    name: '배당성장 집중형 (SCHD 500주)',
+    name: '배당성장 집중형 (SCHD 80% + JEPI 20%)',
     description: 'SCHD 위주로 모아가며 3, 6, 9, 12월 분기마다 큼직한 배당 보너스를 챙기는 자본성장 중심형',
     portfolio: { SCHD: 500, JEPI: 100 },
+    weights: { SCHD: 0.80, JEPI: 0.20 },
   },
   {
     id: 'high_income_all',
-    name: '초고인컴 월배당 올인형 (JEPI+JEPQ)',
+    name: '초고인컴 월배당 올인형 (JEPI 50% + JEPQ 50%)',
     description: '매월 초 12달 내내 일정하고 풍부한 8~9%대 현금흐름으로 생활비를 충당하는 은퇴 파이어형',
     portfolio: { JEPI: 500, JEPQ: 500 },
+    weights: { JEPI: 0.50, JEPQ: 0.50 },
+  },
+  {
+    id: 'all_weather',
+    name: '올웨더 배당 방어형 (SCHD 40% + VOO 30% + TLT 30%)',
+    description: '배당성장, 시장지수 성장, 안전자산 미국채를 골고루 담아 경제위기에도 흔들리지 않는 방어형',
+    portfolio: { SCHD: 250, VOO: 30, TLT: 150 },
+    weights: { SCHD: 0.40, VOO: 0.30, TLT: 0.30 },
   },
 ];
+
+/**
+ * 총 투자금(달러 기준)을 비중에 따라 각 ETF 매수 가능 주수로 자동 환산
+ */
+export function allocateBudgetToPortfolio(
+  totalBudgetUSD: number,
+  weights: Record<string, number>
+): Record<string, number> {
+  const result: Record<string, number> = {};
+  Object.entries(weights).forEach(([ticker, weight]) => {
+    const etf = ETF_DATABASE[ticker];
+    if (etf && etf.currentPrice > 0 && weight > 0) {
+      const allocatedUSD = totalBudgetUSD * weight;
+      const shares = Math.floor(allocatedUSD / etf.currentPrice);
+      result[ticker] = Math.max(0, shares);
+    } else {
+      result[ticker] = 0;
+    }
+  });
+  return result;
+}
+
+/**
+ * 포트폴리오의 총 투자 원금(원화 및 달러) 계산
+ */
+export function calculatePortfolioTotalCapital(
+  portfolio: Record<string, number>,
+  exchangeRate = 1350
+): { totalUSD: number; totalKRW: number } {
+  let totalUSD = 0;
+  Object.entries(portfolio).forEach(([ticker, shares]) => {
+    if (shares > 0) {
+      const price = ETF_DATABASE[ticker]?.currentPrice || 0;
+      totalUSD += shares * price;
+    }
+  });
+  return {
+    totalUSD: Math.round(totalUSD),
+    totalKRW: Math.round(totalUSD * exchangeRate),
+  };
+}
 
 const TAX_RATE = 0.15; // 미국 배당 원천징수세 15%
 

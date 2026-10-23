@@ -1,22 +1,22 @@
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import type { Ticker, DividendEvent } from '@/types/database';
-import { POPULAR_ETFS } from '@/lib/calculator/target-dividend';
+import { ETF_DATABASE } from '@/lib/data/etf-database';
 import { TICKER_SCHEDULES } from '@/lib/calculator/dividend-calendar';
 
 /**
  * 로컬 기본 목업 티커 목록 (Supabase 미연동 시 폴백)
  */
-const FALLBACK_TICKERS: Ticker[] = Object.values(POPULAR_ETFS).map((etf) => ({
+const FALLBACK_TICKERS: Ticker[] = Object.values(ETF_DATABASE).map((etf) => ({
   ticker: etf.ticker,
   name: etf.nameKo ? `${etf.nameKo} (${etf.name})` : etf.name,
   current_price: etf.currentPrice,
   dividend_yield: etf.dividendYield,
-  dividend_growth_5y: etf.dividendGrowth5y,
+  dividend_growth_5y: etf.dividendGrowth5y ?? null,
   capital_growth_est: 0.05,
-  expense_ratio: etf.expenseRatio,
+  expense_ratio: etf.expenseRatio ?? null,
   frequency: etf.frequency,
   pay_months: etf.payMonths,
-  five_year_return: etf.fiveYearReturn,
+  five_year_return: etf.fiveYearReturn ?? null,
   category: etf.category,
   inception_date: '2015-01-01',
   updated_at: new Date().toISOString(),
