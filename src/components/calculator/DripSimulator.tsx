@@ -514,6 +514,44 @@ export default function DripSimulator() {
         </div>
       </div>
 
+      {/* 4-1. 퀀트 정밀 지표 바 (인플레이션 2.5% 감안 실질 구매력 & YoC) */}
+      <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-400/10 to-income/10 border border-amber-300/40 flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
+        <div className="flex items-center gap-3">
+          <span className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-2xs">
+            ⚖️
+          </span>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold text-sm text-brand-primary">
+                퀀트 실질 구매력 분석 (연 물가상승률 2.5% 반영)
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-200">
+                구매력 보존율 {result.inflationPurchasingPowerRate}%
+              </span>
+            </div>
+            <p className="text-brand-muted mt-0.5">
+              화폐 가치 하락을 감안한 {years}년 뒤 실질 월배당금은{' '}
+              <strong className="text-brand-primary font-bold">
+                {formatCurrency(result.inflationAdjustedMonthlyDividendKRW, 'KRW')}
+              </strong>
+              이며, 실질 총자산은{' '}
+              <strong className="text-brand-primary font-bold">
+                {formatCurrency(result.inflationAdjustedEndingValueKRW, 'KRW')}
+              </strong>
+              입니다.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 shrink-0 bg-white/80 px-3.5 py-2 rounded-xl border border-amber-200 shadow-2xs">
+          <div className="text-right">
+            <span className="text-[10px] text-brand-muted block font-semibold">최종 원금회수율(YoC)</span>
+            <span className="text-sm font-black text-income num-font">
+              연 {result.dripYieldOnCost.toFixed(1)}%
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* 5. 실전 복리 인사이트 코멘트 (티핑 포인트 & 15% 세율 반영) */}
       <div className="space-y-3">
         {/* 티핑 포인트 배너 */}

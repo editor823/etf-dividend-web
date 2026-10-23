@@ -4,6 +4,12 @@
  */
 
 import { ETF_LIST, ETF_MAP, ETFItem } from '@/data/etfList';
+import {
+  calculateFractionalDripStep,
+  calculateYieldOnCost,
+  calculateInflationAdjustedValue,
+  DEFAULT_INFLATION_RATE,
+} from '@/lib/quantDividendEngine';
 
 export interface BacktestInput {
   ticker: string; // 대상 ETF 티커
@@ -47,7 +53,12 @@ export interface BacktestResult {
   totalProfitKRW: number; // 순수익 (총 평가 자산 - 납입 원금)
   cagr: number; // 연평균 복리 수익률 (Compound Annual Growth Rate)
   endingShares: number; // 최종 보유 주식 수
-  yieldOnCost: number; // 원금 대비 현재 배당수익률 (YoC)
+  yieldOnCost: number; // 원금 대비 현재 배당수익률 (YoC, %)
+
+  // 퀀트 엔진: 물가상승률 2.5% 반영 실질 구매력
+  realTotalAssetKRW: number;
+  realMonthlyDividendKRW: number;
+  purchasingPowerPercent: number; // 화폐 구매력 보존율 (%)
 
   // DRIP vs 현금 인출 비교
   dripBonusKRW: number; // DRIP 재투자 시 추가 창출된 자산 격차
@@ -227,8 +238,14 @@ export function runHistoricalBacktest(input: BacktestInput): BacktestResult {
     const cashMonthDivUSD = sharesCash * currentPriceUSD * monthlyAfterTaxYield;
     accumulatedCashDivUSD += cashMonthDivUSD;
 
-    // 4. DRIP 재투자 처리: 배당금으로 당월 주가에 주식 추가 매수
-    sharesDrip += dripMonthDivUSD / currentPriceUSD;
+    // 4. 퀀트 정밀 엔진: 소수점 주식 재투자 (Fractional DRIP) 처리
+    const dripStep = calculateFractionalDripStep({
+      currentShares: sharesDrip,
+      sharePrice: currentPriceUSD,
+      dividendPerShare: currentPriceUSD * (monthlyAfterTaxYield / (1 - 0.15)),
+      taxRate: 0.15,
+    });
+    sharesDrip = dripStep.totalEndingShares;
 
     // 5. 사용자가 선택한 DRIP On/Off 상태에 따른 자산 집계
     const currentShares = isDripEnabled ? sharesDrip : sharesCash;
@@ -272,9 +289,20 @@ export function runHistoricalBacktest(input: BacktestInput): BacktestResult {
       ? Math.pow(Math.max(0.01, currentTotalAssetKRW / totalPrincipalKRW), 1 / periodYears) - 1
       : 0;
 
-  // 원금 대비 배당수익률 (Yield on Cost)
-  const yieldOnCost =
-    totalPrincipalKRW > 0 ? currentAnnualDividendKRW / totalPrincipalKRW : 0;
+  // 퀀트 엔진: 원금 대비 배당수익률 (Yield on Cost) 정밀 연산 (%)
+  const yieldOnCost = calculateYieldOnCost(currentAnnualDividendKRW, totalPrincipalKRW);
+
+  // 퀀트 엔진: 인플레이션 2.5% 감안 실질 구매력 계산
+  const inflAssetAdj = calculateInflationAdjustedValue(
+    currentTotalAssetKRW,
+    periodYears,
+    DEFAULT_INFLATION_RATE
+  );
+  const inflDivAdj = calculateInflationAdjustedValue(
+    currentMonthlyDividendKRW,
+    periodYears,
+    DEFAULT_INFLATION_RATE
+  );
 
   // DRIP 보너스 산출 (DRIP 켰을 때와 안 켰을 때의 총자산 격차)
   const dripEndingValKRW = sharesDrip * etf.currentPriceUSD * exchangeRate;
@@ -313,6 +341,11 @@ export function runHistoricalBacktest(input: BacktestInput): BacktestResult {
     cagr,
     endingShares: finalPoint.sharesHeld,
     yieldOnCost,
+    realTotalAssetKRW: inflAssetAdj.realValue,
+    realMonthlyDividendKRW: inflDivAdj.realValue,
+    purchasingPowerPercent: Number(
+      (inflAssetAdj.inflationDiscountFactor * 100).toFixed(1)
+    ),
     dripBonusKRW: Math.round(dripBonusKRW),
     dripBonusPercent: Number(dripBonusPercent.toFixed(1)),
     crisisInsightTitle: title,

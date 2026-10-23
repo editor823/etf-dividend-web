@@ -437,9 +437,40 @@ export default function HistoricalSimulator() {
           <div className="text-[11px] text-brand-muted pt-2 border-t border-subtle-border flex items-center justify-between">
             <span>원금 대비 배당률 (YoC)</span>
             <span className="font-bold text-income num-font">
-              {formatPercent(result.yieldOnCost, 1)}
+              연 {result.yieldOnCost.toFixed(1)}%
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* 3-1. 퀀트 실질 구매력 & 인플레이션 보존율 바 */}
+      <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-400/10 to-income/10 border border-amber-300/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2.5">
+          <span className="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+            ⚖️
+          </span>
+          <div>
+            <span className="font-extrabold text-brand-primary">
+              퀀트 실질 구매력 분석 (연 물가상승률 2.5% 감가상각 반영)
+            </span>
+            <p className="text-[11px] text-brand-muted mt-0.5">
+              과거 {periodYears}년 전 화폐가치 기준 현재 실질 자산은{' '}
+              <strong className="text-brand-primary font-bold">
+                {formatCurrency(result.realTotalAssetKRW, 'KRW')}
+              </strong>
+              이며, 실질 월배당금은{' '}
+              <strong className="text-brand-primary font-bold">
+                {formatCurrency(result.realMonthlyDividendKRW, 'KRW')}
+              </strong>
+              입니다. (화폐 구매력 보존율: {result.purchasingPowerPercent}%)
+            </p>
+          </div>
+        </div>
+        <div className="text-right shrink-0 bg-white/80 px-3 py-1.5 rounded-xl border border-amber-200">
+          <span className="text-[10px] text-brand-muted block font-semibold">원금회수율 (YoC)</span>
+          <span className="text-sm font-black text-income num-font">
+            연 {result.yieldOnCost.toFixed(1)}%
+          </span>
         </div>
       </div>
 

@@ -1,4 +1,10 @@
 import { ETF_MAP, ETFItem } from '@/data/etfList';
+import {
+  calculateFractionalDripStep,
+  calculateYieldOnCost,
+  calculateInflationAdjustedValue,
+  DEFAULT_INFLATION_RATE,
+} from '@/lib/quantDividendEngine';
 
 /**
  * 배당 재투자(DRIP) 스노우볼 복리 시뮬레이터 연산 엔진
@@ -32,6 +38,9 @@ export interface DripYearlyPoint {
   nonDripShares: number;
   dripMonthlyNetDividendKRW: number;
   nonDripMonthlyNetDividendKRW: number;
+  yieldOnCost: number; // 원금회수율 (%)
+  realDripValueKRW: number; // 인플레 2.5% 감안 실질 구매력 자산
+  realMonthlyDividendKRW: number; // 인플레 2.5% 감안 실질 월배당금
 }
 
 export interface DripSimulationResult {
@@ -41,6 +50,11 @@ export interface DripSimulationResult {
   totalPrincipalKRW: number;
   years: number;
   exchangeRate: number;
+
+  // 퀀트 엔진: 인플레이션 2.5% 반영 실질 구매력 지표
+  inflationAdjustedEndingValueKRW: number;
+  inflationAdjustedMonthlyDividendKRW: number;
+  inflationPurchasingPowerRate: number; // % (예: 78.1%)
 
   // DRIP 재투자 최종 결과
   dripEndingValueUSD: number;
@@ -252,13 +266,21 @@ export function simulateDripSnowball(input: DripInput): DripSimulationResult {
     nonDripStockValueKRW: Math.round(nonDripShares * price * exchangeRate),
     accumulatedCashDividendsKRW: 0,
     snowballAdvantageKRW: 0,
-    dripShares: Number(dripShares.toFixed(1)),
-    nonDripShares: Number(nonDripShares.toFixed(1)),
+    dripShares: Number(dripShares.toFixed(4)),
+    nonDripShares: Number(nonDripShares.toFixed(4)),
     dripMonthlyNetDividendKRW: Math.round(
       ((dripShares * annualDPS * (1 - TAX_RATE)) / 12) * exchangeRate
     ),
     nonDripMonthlyNetDividendKRW: Math.round(
       ((nonDripShares * annualDPS * (1 - TAX_RATE)) / 12) * exchangeRate
+    ),
+    yieldOnCost: calculateYieldOnCost(
+      dripShares * annualDPS * (1 - TAX_RATE) * exchangeRate,
+      principalUSD * exchangeRate
+    ),
+    realDripValueKRW: Math.round(dripShares * price * exchangeRate),
+    realMonthlyDividendKRW: Math.round(
+      ((dripShares * annualDPS * (1 - TAX_RATE)) / 12) * exchangeRate
     ),
   });
 
@@ -267,12 +289,13 @@ export function simulateDripSnowball(input: DripInput): DripSimulationResult {
     // 1. 당월 주가 및 주당 배당금 업데이트
     price = price * (1 + monthlyPriceGrowth);
     annualDPS = annualDPS * (1 + monthlyDivGrowth);
-    const monthlyNetDPS = (annualDPS / 12) * (1 - TAX_RATE); // 세후 주당 월배당금
+    const monthlyGrossDPS = annualDPS / 12;
+    const monthlyNetDPS = monthlyGrossDPS * (1 - TAX_RATE); // 세후 주당 월배당금
 
-    // 2. 월 정기 추가 적립금으로 주식 매수
+    // 2. 월 정기 추가 적립금으로 주식 매수 (소수점 4자리 정밀)
     if (monthlyUSD > 0) {
       principalUSD += monthlyUSD;
-      const contributedShares = monthlyUSD / price;
+      const contributedShares = Number((monthlyUSD / price).toFixed(4));
       dripShares += contributedShares;
       nonDripShares += contributedShares;
     }
@@ -281,7 +304,14 @@ export function simulateDripSnowball(input: DripInput): DripSimulationResult {
     const nonDripMonthDiv = nonDripShares * monthlyNetDPS;
     accumulatedCashDividendsUSD += nonDripMonthDiv;
 
-    const dripMonthDiv = dripShares * monthlyNetDPS;
+    // 4. 퀀트 정밀 엔진: 소수점 주식 재투자 (Fractional DRIP) 계산
+    const dripStep = calculateFractionalDripStep({
+      currentShares: dripShares,
+      sharePrice: price,
+      dividendPerShare: monthlyGrossDPS,
+      taxRate: TAX_RATE,
+    });
+    const dripMonthDiv = dripStep.netDividend;
     accumulatedDripDividendsUSD += dripMonthDiv;
 
     // 티핑 포인트 감지: DRIP 월 배당금이 월 적립금을 처음으로 넘어서는 달
@@ -294,8 +324,8 @@ export function simulateDripSnowball(input: DripInput): DripSimulationResult {
       tippingPointDividendUSD = dripMonthDiv;
     }
 
-    // 4. DRIP 재투자: 세후 배당금으로 주식을 즉시 추가 매수
-    dripShares += dripMonthDiv / price;
+    // 재투자 후 총 보유 주식 수 업데이트
+    dripShares = dripStep.totalEndingShares;
 
     // 매 12개월(1년 단위)마다 연도별 포인트 기록
     if (m % 12 === 0) {
@@ -305,12 +335,32 @@ export function simulateDripSnowball(input: DripInput): DripSimulationResult {
       const dripTotValUSD = dripShares * price;
       const advantageUSD = dripTotValUSD - nonDripTotValUSD;
 
+      const dripMonthlyDivKRW = Math.round(dripMonthDiv * exchangeRate);
+      const dripTotValKRW = Math.round(dripTotValUSD * exchangeRate);
+      const principalKRW = Math.round(principalUSD * exchangeRate);
+
+      // 퀀트 지표: YoC 및 인플레이션 실질 구매력 계산
+      const currentYoC = calculateYieldOnCost(
+        dripMonthlyDivKRW * 12,
+        principalKRW
+      );
+      const inflAsset = calculateInflationAdjustedValue(
+        dripTotValKRW,
+        currentYear,
+        DEFAULT_INFLATION_RATE
+      );
+      const inflDiv = calculateInflationAdjustedValue(
+        dripMonthlyDivKRW,
+        currentYear,
+        DEFAULT_INFLATION_RATE
+      );
+
       chartData.push({
         year: currentYear,
         yearLabel: `${currentYear}년차`,
-        principalKRW: Math.round(principalUSD * exchangeRate),
+        principalKRW,
         principalUSD: Math.round(principalUSD),
-        dripValueKRW: Math.round(dripTotValUSD * exchangeRate),
+        dripValueKRW: dripTotValKRW,
         dripValueUSD: Math.round(dripTotValUSD),
         nonDripTotalValueKRW: Math.round(nonDripTotValUSD * exchangeRate),
         nonDripTotalValueUSD: Math.round(nonDripTotValUSD),
@@ -319,14 +369,15 @@ export function simulateDripSnowball(input: DripInput): DripSimulationResult {
           accumulatedCashDividendsUSD * exchangeRate
         ),
         snowballAdvantageKRW: Math.round(advantageUSD * exchangeRate),
-        dripShares: Number(dripShares.toFixed(1)),
-        nonDripShares: Number(nonDripShares.toFixed(1)),
-        dripMonthlyNetDividendKRW: Math.round(
-          dripMonthDiv * exchangeRate
-        ),
+        dripShares: Number(dripShares.toFixed(2)),
+        nonDripShares: Number(nonDripShares.toFixed(2)),
+        dripMonthlyNetDividendKRW: dripMonthlyDivKRW,
         nonDripMonthlyNetDividendKRW: Math.round(
           nonDripMonthDiv * exchangeRate
         ),
+        yieldOnCost: currentYoC,
+        realDripValueKRW: inflAsset.realValue,
+        realMonthlyDividendKRW: inflDiv.realValue,
       });
     }
   }
@@ -345,7 +396,7 @@ export function simulateDripSnowball(input: DripInput): DripSimulationResult {
     nonDripEndingTotalValueUSD > 0
       ? (snowballAdvantageUSD / nonDripEndingTotalValueUSD) * 100
       : 0;
-  const snowballExtraShares = Number((dripShares - nonDripShares).toFixed(1));
+  const snowballExtraShares = Number((dripShares - nonDripShares).toFixed(2));
 
   const dripShareMultiplier =
     initialShares > 0 ? Number((dripShares / initialShares).toFixed(1)) : 1;
@@ -359,13 +410,26 @@ export function simulateDripSnowball(input: DripInput): DripSimulationResult {
 
   const finalMonthlyDPS = (annualDPS / 12) * (1 - TAX_RATE);
   const dripEndingMonthlyNetDividendUSD = dripShares * finalMonthlyDPS;
-  const dripEndingMonthlyNetDividendKRW =
-    dripEndingMonthlyNetDividendUSD * exchangeRate;
+  const dripEndingMonthlyNetDividendKRW = Math.round(
+    dripEndingMonthlyNetDividendUSD * exchangeRate
+  );
   const dripEndingAnnualNetDividendUSD = dripEndingMonthlyNetDividendUSD * 12;
   const dripEndingAnnualNetDividendKRW = dripEndingMonthlyNetDividendKRW * 12;
 
   const dripYieldOnCost =
-    principalUSD > 0 ? dripEndingAnnualNetDividendUSD / principalUSD : 0;
+    principalUSD > 0 ? (dripEndingAnnualNetDividendUSD / principalUSD) * 100 : 0;
+
+  // 퀀트 엔진: 최종 인플레이션 실질 구매력 지표
+  const finalInflationAdjusted = calculateInflationAdjustedValue(
+    dripEndingValueKRW,
+    safeYears,
+    DEFAULT_INFLATION_RATE
+  );
+  const finalMonthlyDivAdjusted = calculateInflationAdjustedValue(
+    dripEndingMonthlyNetDividendKRW,
+    safeYears,
+    DEFAULT_INFLATION_RATE
+  );
 
   // 티핑 포인트 코멘트
   const tippingYear = tippingPointMonth ? Math.ceil(tippingPointMonth / 12) : null;
@@ -390,10 +454,15 @@ export function simulateDripSnowball(input: DripInput): DripSimulationResult {
     totalPrincipalKRW: Math.round(principalUSD * exchangeRate),
     years: safeYears,
     exchangeRate,
+    inflationAdjustedEndingValueKRW: finalInflationAdjusted.realValue,
+    inflationAdjustedMonthlyDividendKRW: finalMonthlyDivAdjusted.realValue,
+    inflationPurchasingPowerRate: Number(
+      (finalInflationAdjusted.inflationDiscountFactor * 100).toFixed(1)
+    ),
     dripEndingValueUSD,
     dripEndingValueKRW,
-    dripEndingShares: Number(dripShares.toFixed(1)),
-    dripInitialShares: Number(initialShares.toFixed(1)),
+    dripEndingShares: Number(dripShares.toFixed(2)),
+    dripInitialShares: Number(initialShares.toFixed(2)),
     dripShareMultiplier,
     dripTotalDividendsReinvestedUSD: Math.round(accumulatedDripDividendsUSD),
     dripTotalDividendsReinvestedKRW: Math.round(
@@ -412,7 +481,7 @@ export function simulateDripSnowball(input: DripInput): DripSimulationResult {
     nonDripAccumulatedCashDividendsKRW: lastPoint.accumulatedCashDividendsKRW,
     nonDripEndingTotalValueUSD,
     nonDripEndingTotalValueKRW,
-    nonDripEndingShares: Number(nonDripShares.toFixed(1)),
+    nonDripEndingShares: Number(nonDripShares.toFixed(2)),
     nonDripEndingMonthlyNetDividendUSD:
       lastPoint.nonDripMonthlyNetDividendKRW / exchangeRate,
     nonDripEndingMonthlyNetDividendKRW:
