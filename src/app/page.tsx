@@ -22,7 +22,6 @@ import HistoricalSimulator from '@/components/calculator/HistoricalSimulator';
 import BarbellOptimizer from '@/components/calculator/BarbellOptimizer';
 import DripSimulator from '@/components/calculator/DripSimulator';
 import DividendCalendar from '@/components/calculator/DividendCalendar';
-import EtfPopularityRanking from '@/components/calculator/EtfPopularityRanking';
 import QuickGuideModal from '@/components/calculator/QuickGuideModal';
 import SavePortfolioModal from '@/components/auth/SavePortfolioModal';
 import AdminDashboardModal from '@/components/admin/AdminDashboardModal';
@@ -229,12 +228,12 @@ export default function Home() {
             <span className="px-3 py-1.5 rounded-xl bg-white border border-subtle-border shadow-2xs font-semibold text-brand-primary flex items-center gap-1.5">
               📅 12개월 배당 캘린더
             </span>
-            <a
-              href="#etf-rankings"
+            <Link
+              href="/rankings"
               className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-300/80 shadow-2xs font-extrabold text-amber-900 flex items-center gap-1.5 hover:scale-105 transition-all"
             >
               🔥 서학 vs 동학 인기 랭킹
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -249,11 +248,6 @@ export default function Home() {
             {activeTab === 'calendar' && <DividendCalendar />}
           </div>
         </section>
-
-        {/* 서학개미 vs 동학개미 인기 ETF 순위 & 절세 매칭 보드 */}
-        <div id="etf-rankings" className="scroll-mt-24 pt-2">
-          <EtfPopularityRanking onSelectCalculator={scrollToSection} />
-        </div>
 
         {/* 메인 계산기 하단 광고 슬롯 */}
         <AdBannerSlot slotId="home-calculator-bottom-slot" className="my-8" />

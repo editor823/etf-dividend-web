@@ -49,6 +49,7 @@ export default function Header({
   const isHome = pathname === '/';
   const isGuides = pathname.startsWith('/guides');
   const isAbout = pathname === '/about';
+  const isRankings = pathname === '/rankings';
 
   const tabList: { id: CalculatorTab; label: string; icon: string }[] = [
     { id: 'reverse', label: '1. 역산기', icon: '🎯' },
@@ -124,10 +125,14 @@ export default function Header({
             </Link>
 
             <Link
-              href="/#etf-rankings"
-              className="px-3 py-1.5 rounded-xl text-xs font-bold text-orange-700 bg-orange-50 hover:bg-orange-100/80 transition-all flex items-center gap-1.5 border border-orange-200/60 shadow-2xs"
+              href="/rankings"
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border shadow-2xs ${
+                isRankings
+                  ? 'bg-orange-600 text-white border-orange-600 font-extrabold shadow-xs'
+                  : 'text-orange-700 bg-orange-50 hover:bg-orange-100/80 border-orange-200/60'
+              }`}
             >
-              <Flame className="w-3.5 h-3.5 text-orange-600" />
+              <Flame className={`w-3.5 h-3.5 ${isRankings ? 'text-white' : 'text-orange-600'}`} />
               <span>서학·동학 랭킹</span>
             </Link>
 
@@ -323,7 +328,7 @@ export default function Header({
             </Link>
 
             <Link
-              href="/#etf-rankings"
+              href="/rankings"
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center justify-between p-3 rounded-xl text-xs font-bold bg-orange-50/80 border border-orange-200/80 text-orange-900 hover:bg-orange-100/80 transition-colors shadow-2xs"
             >
@@ -332,7 +337,7 @@ export default function Header({
                 <span>🔥 서학 vs 동학 ETF 인기 랭킹</span>
               </span>
               <span className="text-[10px] bg-orange-500 text-white font-bold px-2 py-0.5 rounded-full font-mono">
-                TOP 7
+                랭킹 센터
               </span>
             </Link>
 
