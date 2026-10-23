@@ -74,15 +74,12 @@ export default function SemanticSearchHero({ onSelectEtfForCalculator }: Semanti
       {/* 1. 검색 모드 전환 토글 바 */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-1">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-xs">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center text-white shadow-xs">
             <Sparkles className="w-4 h-4 animate-pulse" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="text-sm font-extrabold text-brand-primary">AI 시맨틱 맞춤 검색</span>
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-700 border border-purple-200">
-                Gemma 2 Vector
-              </span>
+              <span className="text-sm font-extrabold text-brand-primary">AI 맞춤 검색</span>
             </div>
             <p className="text-[11px] text-brand-muted hidden sm:block">
               어려운 금융 용어 대신 내 고민을 자연어로 편하게 물어보세요
@@ -97,7 +94,7 @@ export default function SemanticSearchHero({ onSelectEtfForCalculator }: Semanti
             onClick={() => setSearchMode('ai')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
               searchMode === 'ai'
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-xs'
+                ? 'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-xs'
                 : 'text-brand-muted hover:text-brand-primary'
             }`}
           >
@@ -124,13 +121,13 @@ export default function SemanticSearchHero({ onSelectEtfForCalculator }: Semanti
         <div
           className={`relative flex items-center bg-white rounded-2xl border-2 transition-all shadow-md overflow-hidden ${
             searchMode === 'ai'
-              ? 'border-purple-300 focus-within:border-purple-500 focus-within:ring-4 focus-within:ring-purple-100'
+              ? 'border-rose-300 focus-within:border-rose-500 focus-within:ring-4 focus-within:ring-rose-100'
               : 'border-subtle-border focus-within:border-brand-primary focus-within:ring-4 focus-within:ring-gray-100'
           }`}
         >
           <div className="pl-4 pr-2 text-brand-muted flex items-center justify-center">
             {searchMode === 'ai' ? (
-              <Sparkles className="w-5 h-5 text-purple-500" />
+              <Sparkles className="w-5 h-5 text-rose-500" />
             ) : (
               <Search className="w-5 h-5 text-gray-400" />
             )}
@@ -173,25 +170,25 @@ export default function SemanticSearchHero({ onSelectEtfForCalculator }: Semanti
               key={idx}
               type="button"
               onClick={() => handleChipClick(chip.query)}
-              className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200/80 text-xs font-semibold transition-all shadow-2xs hover:scale-[1.02] flex items-center gap-1.5 cursor-pointer text-left"
+              className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-950 border border-rose-200/80 text-xs font-semibold transition-all shadow-2xs hover:scale-[1.02] flex items-center gap-1.5 cursor-pointer text-left"
             >
-              <span className="text-purple-500">💬</span>
+              <span className="text-rose-500">💬</span>
               <span>{chip.label}</span>
             </button>
           ))}
         </div>
       )}
 
-      {/* 4. AI 시맨틱 검색 결과 (상위 3개 카드 팝업 레이아웃) */}
+      {/* 4. AI 검색 결과 (상위 3개 카드 팝업 레이아웃) */}
       {searchMode === 'ai' && query.trim() && (
-        <div className="mt-4 p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-purple-50/60 to-white border border-purple-200/80 shadow-md space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="flex items-center justify-between border-b border-purple-100 pb-3">
+        <div className="mt-4 p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-rose-50/60 to-white border border-rose-200/80 shadow-md space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="flex items-center justify-between border-b border-rose-100 pb-3">
             <div className="flex items-center gap-2">
-              <span className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center text-xs font-extrabold shadow-2xs">
+              <span className="w-6 h-6 rounded-lg bg-rose-600 text-white flex items-center justify-center text-xs font-extrabold shadow-2xs">
                 🎯
               </span>
               <h3 className="text-sm font-extrabold text-brand-primary">
-                AI 분석 매칭 결과 <span className="text-xs font-normal text-purple-700">(적합도 순)</span>
+                AI 분석 매칭 결과 <span className="text-xs font-normal text-rose-700">(적합도 순)</span>
               </h3>
             </div>
             <span className="text-[11px] text-brand-muted">
@@ -203,7 +200,7 @@ export default function SemanticSearchHero({ onSelectEtfForCalculator }: Semanti
             {aiResults.map((result, idx) => (
               <div
                 key={result.ticker}
-                className="relative flex flex-col justify-between p-4 rounded-xl bg-white border border-purple-200 hover:border-purple-400 hover:shadow-lg transition-all group"
+                className="relative flex flex-col justify-between p-4 rounded-xl bg-white border border-rose-200 hover:border-rose-400 hover:shadow-lg transition-all group"
               >
                 {/* 상단 랭킹 & 적합도 뱃지 */}
                 <div className="flex items-center justify-between gap-2 mb-2">
@@ -226,13 +223,13 @@ export default function SemanticSearchHero({ onSelectEtfForCalculator }: Semanti
                       {result.category}
                     </span>
                   </div>
-                  <div className="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-2xs shrink-0">
+                  <div className="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-2xs shrink-0">
                     적합도 {result.matchPercentage}%
                   </div>
                 </div>
 
                 {/* 하이라이트 배지 */}
-                <div className="text-[11px] font-bold text-purple-700 mb-2">
+                <div className="text-[11px] font-bold text-rose-700 mb-2">
                   {result.highlightBadge}
                 </div>
 
@@ -247,7 +244,7 @@ export default function SemanticSearchHero({ onSelectEtfForCalculator }: Semanti
                     {result.matchedDimensions.slice(0, 2).map((dim, i) => (
                       <span
                         key={i}
-                        className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-100"
+                        className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-100"
                       >
                         #{dim}
                       </span>
@@ -259,7 +256,7 @@ export default function SemanticSearchHero({ onSelectEtfForCalculator }: Semanti
                 <button
                   type="button"
                   onClick={() => handleApplyToCalculator(result.ticker)}
-                  className="w-full mt-auto py-2 px-3 rounded-lg bg-brand-primary hover:bg-purple-700 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 group-hover:bg-purple-600 cursor-pointer"
+                  className="w-full mt-auto py-2 px-3 rounded-lg bg-brand-primary hover:bg-rose-600 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 group-hover:bg-rose-600 cursor-pointer"
                 >
                   <Target className="w-3.5 h-3.5" />
                   <span>역산기로 바로 계산하기</span>
