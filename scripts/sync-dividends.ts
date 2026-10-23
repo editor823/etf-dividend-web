@@ -5,9 +5,15 @@ dotenv.config();
 import YahooFinance from 'yahoo-finance2';
 import { createClient } from '@supabase/supabase-js';
 
+import https from 'https';
+
 // Supabase 환경변수 로드
 const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+// 텔레그램 봇 환경변수 로드
+const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN || '8610446756:AAFtjN-p45BHjD5xTaTuVSRb39kf6fI-0TU';
+const telegramChatId = process.env.TELEGRAM_CHAT_ID || '1999553361';
 
 const isSupabaseConfigured = Boolean(
   supabaseUrl &&
@@ -104,7 +110,93 @@ const ETF_METADATA: Record<string, EtfMetaConfig> = {
     category: '액티브 배당성장',
     inception_date: '2016-12-14',
   },
+  SPYI: {
+    ticker: 'SPYI',
+    name: 'NEOS S&P 500 High Income ETF',
+    frequency: 'monthly',
+    pay_months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    expense_ratio: 0.68,
+    dividend_growth_5y: 5.0,
+    capital_growth_est: 4.5,
+    category: '고인컴 커버드콜',
+    inception_date: '2022-08-30',
+  },
+  O: {
+    ticker: 'O',
+    name: 'Realty Income Corp',
+    frequency: 'monthly',
+    pay_months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    expense_ratio: 0.0,
+    dividend_growth_5y: 3.5,
+    capital_growth_est: 3.0,
+    category: '월배당 리츠',
+    inception_date: '1994-10-18',
+  },
 };
+
+interface SyncReportItem {
+  ticker: string;
+  price: number;
+  changePercent: number;
+  yieldPercent: number;
+  category: string;
+}
+
+// 텔레그램 메시지 발송 함수
+async function sendTelegramMessage(text: string): Promise<boolean> {
+  if (!telegramBotToken || !telegramChatId) {
+    console.log('⚠️ 텔레그램 토큰 또는 Chat ID가 설정되지 않아 발송을 건너뜁니다.');
+    return false;
+  }
+
+  return new Promise((resolve) => {
+    const payload = JSON.stringify({
+      chat_id: telegramChatId,
+      text: text,
+      parse_mode: 'HTML',
+      disable_web_page_preview: true,
+    });
+
+    const options = {
+      hostname: 'api.telegram.org',
+      port: 443,
+      path: `/bot${telegramBotToken}/sendMessage`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload),
+      },
+    };
+
+    const req = https.request(options, (res) => {
+      let body = '';
+      res.on('data', (chunk) => (body += chunk));
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(body);
+          if (parsed.ok) {
+            console.log('📱 ✅ 텔레그램 모닝 브리핑 메시지 발송 성공!');
+            resolve(true);
+          } else {
+            console.error('📱 ❌ 텔레그램 발송 실패:', parsed.description);
+            resolve(false);
+          }
+        } catch {
+          console.error('📱 ❌ 텔레그램 응답 파싱 실패:', body);
+          resolve(false);
+        }
+      });
+    });
+
+    req.on('error', (err) => {
+      console.error('📱 ❌ 텔레그램 요청 중 네트워크 에러:', err.message);
+      resolve(false);
+    });
+
+    req.write(payload);
+    req.end();
+  });
+}
 
 async function syncEtfData() {
   console.log('====================================================');
@@ -116,15 +208,17 @@ async function syncEtfData() {
   const tickers = Object.keys(ETF_METADATA);
   const now = new Date();
   const oneYearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+  const reportItems: SyncReportItem[] = [];
 
   for (const ticker of tickers) {
     try {
       const meta = ETF_METADATA[ticker];
       console.log(`📊 [${ticker}] 실시간 데이터 조회 중...`);
 
-      // 1. 현재 주가 및 기본 정보 조회
+      // 1. 현재 주가 및 등락률 조회
       const quote = await yf.quote(ticker);
       const currentPrice = Number((quote.regularMarketPrice ?? 0).toFixed(2));
+      const changePercent = Number((quote.regularMarketChangePercent ?? 0).toFixed(2));
 
       // 2. 배당수익률 조회
       let divYield = 0;
@@ -144,12 +238,20 @@ async function syncEtfData() {
       // 기본값 폴백 (야후 파이낸스 일시적 null 대비)
       if (divYield === 0) {
         const fallbackYields: Record<string, number> = {
-          SCHD: 3.42, JEPI: 7.85, JEPQ: 9.20, VOO: 1.45, QQQ: 0.58, DIVO: 4.60
+          SCHD: 3.42, JEPI: 7.85, JEPQ: 9.20, VOO: 1.45, QQQ: 0.58, DIVO: 4.60, SPYI: 11.8, O: 5.45
         };
         divYield = fallbackYields[ticker] || 3.0;
       }
 
-      console.log(`   - 현재가: $${currentPrice}`);
+      reportItems.push({
+        ticker,
+        price: currentPrice,
+        changePercent,
+        yieldPercent: divYield,
+        category: meta.category,
+      });
+
+      console.log(`   - 현재가: $${currentPrice} (${changePercent >= 0 ? '+' : ''}${changePercent}%)`);
       console.log(`   - 배당수익률: ${divYield}%`);
 
       // 3. 과거 1년 치 배당 내역 조회
@@ -195,7 +297,6 @@ async function syncEtfData() {
         if (rawDividends.length > 0) {
           const dividendRecords = rawDividends.map((div) => {
             const exDate = new Date(div.date).toISOString().split('T')[0];
-            // 지급일은 배당락일 기준 대략 5영업일 후로 산정 (공시 일정 기준)
             const payDate = new Date(new Date(div.date).getTime() + 5 * 24 * 60 * 60 * 1000)
               .toISOString()
               .split('T')[0];
@@ -229,8 +330,41 @@ async function syncEtfData() {
     }
   }
 
+  // 5. 텔레그램 모닝 브리핑 메시지 조합 및 발송
+  if (reportItems.length > 0) {
+    const kstDate = new Intl.DateTimeFormat('ko-KR', {
+      timeZone: 'Asia/Seoul',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'short',
+    }).format(new Date());
+
+    let message = `☀️ <b>[DIVIDEND INTEL] 모닝 배당 브리핑</b>\n`;
+    message += `📅 <b>${kstDate}</b> (뉴욕 증시 마감)\n\n`;
+    message += `미국 증시 마감 후 주요 배당 ETF의 최신 주가와 배당 현황을 전해드립니다.\n\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `📊 <b>주요 배당 ETF 실시간 현황</b>\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━\n`;
+
+    for (const item of reportItems) {
+      const icon = item.changePercent > 0 ? '🔺' : item.changePercent < 0 ? '🔻' : '➖';
+      const sign = item.changePercent > 0 ? '+' : '';
+      message += `<b>${item.ticker}</b> ($${item.price.toFixed(2)}) ${icon} ${sign}${item.changePercent}%\n`;
+      message += `└ 💰 배당률: <b>${item.yieldPercent}%</b> | 🏷️ ${item.category}\n\n`;
+    }
+
+    message += `━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `💡 <b>오늘의 배당 투자 팁</b>\n`;
+    message += `<i>"배당 재투자(DRIP)는 시장의 단기 흔들림을 내 자산의 복리 스노우볼로 바꾸는 가장 든든한 무기입니다."</i>\n\n`;
+    message += `🔍 <b>내 포트폴리오 시뮬레이션:</b>\n`;
+    message += `<a href="https://dividend-intel.vercel.app">https://dividend-intel.vercel.app</a>\n`;
+
+    await sendTelegramMessage(message);
+  }
+
   console.log('====================================================');
-  console.log('🎉 모든 ETF 동기화 파이프라인 처리가 완료되었습니다.');
+  console.log('🎉 모든 ETF 동기화 및 모닝 브리핑 발송이 완료되었습니다.');
   console.log('====================================================');
 }
 
@@ -241,3 +375,4 @@ syncEtfData()
     console.error('치명적 에러 발생:', err);
     process.exit(1);
   });
+
