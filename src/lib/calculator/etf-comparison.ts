@@ -643,8 +643,8 @@ export function calculateCrossoverBattle(
 
   for (let year = 1; year <= safeYears; year++) {
     // 복리 배당성장: NetDiv(t) = NetDiv(1) * (1 + growth)^(year - 1)
-    const annualNetUSD_A = initialAnnualNetUSD_A * Math.pow(1 + growthA, year - 1);
-    const annualNetUSD_B = initialAnnualNetUSD_B * Math.pow(1 + growthB, year - 1);
+    const annualNetUSD_A = initialAnnualNetUSD_A * Math.pow(Math.max(0, 1 + growthA), year - 1);
+    const annualNetUSD_B = initialAnnualNetUSD_B * Math.pow(Math.max(0, 1 + growthB), year - 1);
 
     const annualNetKRW_A = annualNetUSD_A * exchangeRate;
     const annualNetKRW_B = annualNetUSD_B * exchangeRate;
@@ -653,8 +653,8 @@ export function calculateCrossoverBattle(
     const monthlyNetKRW_B = annualNetKRW_B / 12;
 
     // 원금 자산 평가액 (배당금 재투자 제외한 순수 원금 평가액)
-    const assetValUSD_A = initialCapitalUSD * Math.pow(1 + priceGrowthA, year);
-    const assetValUSD_B = initialCapitalUSD * Math.pow(1 + priceGrowthB, year);
+    const assetValUSD_A = initialCapitalUSD * Math.pow(Math.max(0, 1 + priceGrowthA), year);
+    const assetValUSD_B = initialCapitalUSD * Math.pow(Math.max(0, 1 + priceGrowthB), year);
     const assetValKRW_A = assetValUSD_A * exchangeRate;
     const assetValKRW_B = assetValUSD_B * exchangeRate;
 
@@ -664,8 +664,8 @@ export function calculateCrossoverBattle(
     const totalWealthKRW_A = assetValKRW_A + runningCumUSD_A * exchangeRate;
     const totalWealthKRW_B = assetValKRW_B + runningCumUSD_B * exchangeRate;
 
-    const yocA = (annualNetUSD_A / initialCapitalUSD) * 100;
-    const yocB = (annualNetUSD_B / initialCapitalUSD) * 100;
+    const yocA = initialCapitalUSD > 0 ? (annualNetUSD_A / initialCapitalUSD) * 100 : 0;
+    const yocB = initialCapitalUSD > 0 ? (annualNetUSD_B / initialCapitalUSD) * 100 : 0;
 
     const currentWinner =
       annualNetUSD_A > annualNetUSD_B ? 'A' : annualNetUSD_B > annualNetUSD_A ? 'B' : 'TIE';

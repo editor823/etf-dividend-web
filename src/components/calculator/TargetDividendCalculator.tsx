@@ -639,10 +639,13 @@ export default function TargetDividendCalculator({ initialTicker }: TargetDivide
           result.totalCapitalKRW > 0
             ? Math.min(100, Math.round((currentSeedCapital / result.totalCapitalKRW) * 1000) / 10)
             : 0;
-        const currentMonthlyFromSeed = Math.round(
-          (Math.min(currentSeedCapital, result.totalCapitalKRW) / result.totalCapitalKRW) *
-            targetAmount
-        );
+        const currentMonthlyFromSeed =
+          result.totalCapitalKRW > 0
+            ? Math.round(
+                (Math.min(currentSeedCapital, result.totalCapitalKRW) / result.totalCapitalKRW) *
+                  targetAmount
+              )
+            : 0;
         const remainingCapital = Math.max(0, result.totalCapitalKRW - currentSeedCapital);
 
         const quickSeeds = [
