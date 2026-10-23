@@ -358,7 +358,7 @@ async function syncEtfData() {
     message += `💡 <b>오늘의 배당 투자 팁</b>\n`;
     message += `<i>"배당 재투자(DRIP)는 시장의 단기 흔들림을 내 자산의 복리 스노우볼로 바꾸는 가장 든든한 무기입니다."</i>\n\n`;
     message += `🔍 <b>내 포트폴리오 시뮬레이션:</b>\n`;
-    message += `<a href="https://dividend-intel.vercel.app">https://dividend-intel.vercel.app</a>\n`;
+    message += `<a href="https://etf-dividend-web.pages.dev">https://etf-dividend-web.pages.dev</a>\n`;
 
     await sendTelegramMessage(message);
   }
