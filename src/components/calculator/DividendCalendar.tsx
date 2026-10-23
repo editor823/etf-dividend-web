@@ -12,6 +12,8 @@ import {
   Trash2,
   CheckCircle2,
   TrendingUp,
+  Coins,
+  Scale,
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -456,66 +458,65 @@ export default function DividendCalendar() {
         </div>
       </div>
 
-      {/* 3. 파이프라인 진단 및 연간 총 배당 통계 요약 (4대 요약 카드) */}
+      {/* 3. 파이프라인 진단 및 연간 총 배당 통계 요약 (Tremor Financial Metrics Cards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* 카드 1: 파이프라인 완성도 진단 카드 */}
         <div
-          className={`rounded-2xl p-5 border shadow-card space-y-2 ${
+          className={`rounded-2xl p-5 border border-subtle-border border-l-4 shadow-card hover:shadow-md transition-all space-y-2.5 flex flex-col justify-between ${
             result.diagnosis.isComplete
-              ? 'bg-gradient-to-br from-emerald-900 to-brand-dark text-white border-income'
-              : 'bg-white border-amber-300 text-brand-primary'
+              ? 'bg-white border-l-income'
+              : 'bg-white border-l-amber-500'
           }`}
         >
           <div className="flex items-center justify-between text-xs">
-            <span className={result.diagnosis.isComplete ? 'text-white/80' : 'text-brand-muted'}>
+            <span className="font-semibold text-brand-muted flex items-center gap-1.5">
+              <CheckCircle2 className={`w-3.5 h-3.5 ${result.diagnosis.isComplete ? 'text-income' : 'text-amber-500'}`} />
               파이프라인 완성도
             </span>
             <span
-              className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+              className={`px-2 py-0.5 rounded-md text-[11px] font-bold ${
                 result.diagnosis.isComplete
-                  ? 'bg-income text-white'
-                  : 'bg-amber-100 text-amber-800'
+                  ? 'bg-income-light text-income border border-income/30'
+                  : 'bg-amber-50 text-amber-800 border border-amber-200'
               }`}
             >
               {result.diagnosis.paidMonthsCount}/12개월 달성
             </span>
           </div>
+
           <div>
-            <div className="text-2xl sm:text-3xl font-black num-font">
+            <div className="text-xl sm:text-2xl font-black num-font tracking-tight text-brand-primary whitespace-nowrap">
               {result.diagnosis.isComplete ? '100% 월급 완성' : `${12 - result.diagnosis.paidMonthsCount}개월 공백`}
             </div>
-            <p
-              className={`text-xs mt-0.5 line-clamp-2 ${
-                result.diagnosis.isComplete ? 'text-white/80' : 'text-brand-muted'
-              }`}
-            >
+            <p className="text-xs mt-1 text-brand-muted leading-relaxed">
               {result.diagnosis.isComplete
-                ? '🎯 12달 내내 쉬지 않고 돈이 들어옵니다!'
+                ? '🎯 12달 내내 쉬지 않고 배당이 들어옵니다!'
                 : `⚠️ ${result.diagnosis.emptyMonths.map((m) => `${m}월`).join(', ')} 입금 없음`}
             </p>
           </div>
-          <div
-            className={`pt-2 border-t text-[11px] flex items-center justify-between ${
-              result.diagnosis.isComplete ? 'border-white/10 text-white/70' : 'border-subtle-border text-brand-muted'
-            }`}
-          >
-            <span>현금흐름 안전성</span>
-            <span className="font-bold text-income">
+
+          <div className="pt-2 border-t border-subtle-border/80 text-[11px] flex items-center justify-between">
+            <span className="text-brand-muted">현금흐름 안정성</span>
+            <span className={`font-bold ${result.diagnosis.isComplete ? 'text-income' : 'text-amber-600'}`}>
               {result.diagnosis.isComplete ? '최상급 (월급형)' : '보완 추천'}
             </span>
           </div>
         </div>
 
         {/* 카드 2: 연간 총 세후 배당금 */}
-        <div className="bg-white rounded-2xl p-5 border border-subtle-border shadow-card space-y-2">
-          <div className="flex items-center justify-between text-xs text-brand-muted">
-            <span>연간 총 세후 배당 실수령</span>
-            <span className="px-2 py-0.5 rounded-full bg-income-light text-income text-[10px] font-bold">
+        <div className="bg-white rounded-2xl p-5 border border-subtle-border border-l-4 border-l-income shadow-card hover:shadow-md transition-all space-y-2.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-brand-muted flex items-center gap-1.5">
+              <Coins className="w-3.5 h-3.5 text-income" />
+              연간 총 배당 실수령
+            </span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-income-light text-income text-[11px] font-bold border border-income/20">
               15% 세금 차감
             </span>
           </div>
+
           <div>
-            <div className="text-2xl sm:text-3xl font-black num-font text-income">
+            <div className="text-2xl sm:text-3xl font-black num-font tracking-tight text-income">
               {currency === 'KRW'
                 ? formatCurrency(result.totalAnnualNetKRW, 'KRW')
                 : formatCurrency(result.totalAnnualNetUSD, 'USD')}
@@ -526,24 +527,29 @@ export default function DividendCalendar() {
                 : `약 ${formatCurrency(result.totalAnnualNetKRW, 'KRW')}`}
             </p>
           </div>
-          <div className="pt-2 border-t border-subtle-border text-[11px] text-brand-muted flex items-center justify-between">
+
+          <div className="pt-2 border-t border-subtle-border/80 text-[11px] text-brand-muted flex items-center justify-between">
             <span>실질 세후 배당수익률</span>
-            <span className="font-bold text-brand-primary num-font">
+            <span className="font-black text-brand-primary num-font">
               연 {result.effectiveNetYield}%
             </span>
           </div>
         </div>
 
         {/* 카드 3: 월평균 환산 실수령액 */}
-        <div className="bg-white rounded-2xl p-5 border border-subtle-border shadow-card space-y-2">
-          <div className="flex items-center justify-between text-xs text-brand-muted">
-            <span>월평균 환산 실수령액</span>
-            <span className="px-2 py-0.5 rounded-full bg-brand-secondary text-brand-primary text-[10px] font-bold">
+        <div className="bg-white rounded-2xl p-5 border border-subtle-border border-l-4 border-l-blue-600 shadow-card hover:shadow-md transition-all space-y-2.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-brand-muted flex items-center gap-1.5">
+              <Wallet className="w-3.5 h-3.5 text-blue-600" />
+              월평균 환산 실수령액
+            </span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[11px] font-bold border border-blue-200">
               제2의 월급
             </span>
           </div>
+
           <div>
-            <div className="text-2xl sm:text-3xl font-black num-font text-brand-primary">
+            <div className="text-2xl sm:text-3xl font-black num-font tracking-tight text-brand-primary">
               {currency === 'KRW'
                 ? formatCurrency(result.monthlyAverageNetKRW, 'KRW')
                 : formatCurrency(result.monthlyAverageNetUSD, 'USD')}
@@ -552,33 +558,54 @@ export default function DividendCalendar() {
               12개월 균등 환산 기준
             </p>
           </div>
-          <div className="pt-2 border-t border-subtle-border text-[11px] text-brand-muted flex items-center justify-between">
+
+          <div className="pt-2 border-t border-subtle-border/80 text-[11px] text-brand-muted flex items-center justify-between">
             <span>총 투자 원금</span>
-            <span className="font-bold text-brand-primary num-font">
+            <span className="font-black text-brand-primary num-font">
               {formatCurrency(result.totalPortfolioKRW, 'KRW')}
             </span>
           </div>
         </div>
 
         {/* 카드 4: 최고 입금 월 vs 최저 입금 월 편차 */}
-        <div className="bg-white rounded-2xl p-5 border border-subtle-border shadow-card space-y-2">
-          <div className="flex items-center justify-between text-xs text-brand-muted">
-            <span>월별 입금 편차율</span>
-            <span className="px-2 py-0.5 rounded-full bg-brand-secondary text-brand-primary text-[10px] font-bold">
+        <div className="bg-white rounded-2xl p-5 border border-subtle-border border-l-4 border-l-amber-500 shadow-card hover:shadow-md transition-all space-y-2.5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-brand-muted flex items-center gap-1.5">
+              <Scale className="w-3.5 h-3.5 text-amber-600" />
+              월별 입금 편차율
+            </span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 text-[11px] font-bold border border-amber-200">
               고저차: {result.flowDeviationPercent}%
             </span>
           </div>
-          <div>
-            <div className="text-xl sm:text-2xl font-bold num-font text-brand-primary truncate">
-              {result.maxMonthFlow.monthLabel} (최고) vs {result.minMonthFlow.monthLabel}
+
+          <div className="space-y-1.5">
+            <div className="text-base sm:text-lg font-black num-font text-brand-primary flex items-center gap-1.5 whitespace-nowrap">
+              <span>{result.maxMonthFlow.monthLabel} (최고)</span>
+              <span className="text-xs text-brand-muted font-normal">vs</span>
+              <span>{result.minMonthFlow.monthLabel} (최저)</span>
             </div>
-            <p className="text-xs text-brand-muted num-font mt-0.5">
-              최고: {formatCurrency(result.maxMonthFlow.netKRW, 'KRW')} / 최저: {formatCurrency(result.minMonthFlow.netKRW, 'KRW')}
-            </p>
+
+            {/* 최고/최저 미니 2분할 스탯 그리드 */}
+            <div className="grid grid-cols-2 gap-1.5 text-[11px]">
+              <div className="bg-brand-bg px-2 py-1 rounded-md border border-subtle-border/80">
+                <span className="text-brand-muted block text-[10px]">최고 ({result.maxMonthFlow.monthLabel})</span>
+                <span className="font-black num-font text-brand-primary">
+                  {formatCurrency(result.maxMonthFlow.netKRW, 'KRW')}
+                </span>
+              </div>
+              <div className="bg-brand-bg px-2 py-1 rounded-md border border-subtle-border/80">
+                <span className="text-brand-muted block text-[10px]">최저 ({result.minMonthFlow.monthLabel})</span>
+                <span className="font-black num-font text-brand-primary">
+                  {formatCurrency(result.minMonthFlow.netKRW, 'KRW')}
+                </span>
+              </div>
+            </div>
           </div>
-          <div className="pt-2 border-t border-subtle-border text-[11px] text-brand-muted flex items-center justify-between">
+
+          <div className="pt-2 border-t border-subtle-border/80 text-[11px] text-brand-muted flex items-center justify-between">
             <span>현금흐름 균등도</span>
-            <span className="font-semibold text-income">
+            <span className="font-bold text-income">
               {result.flowDeviationPercent < 40 ? '매우 균등' : '분기 집중형'}
             </span>
           </div>
