@@ -12,6 +12,8 @@ import {
   History,
   Repeat,
   BookOpen,
+  Lightbulb,
+  Sparkles,
 } from 'lucide-react';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import TargetDividendCalculator from '@/components/calculator/TargetDividendCalculator';
@@ -20,6 +22,7 @@ import HistoricalSimulator from '@/components/calculator/HistoricalSimulator';
 import BarbellOptimizer from '@/components/calculator/BarbellOptimizer';
 import DripSimulator from '@/components/calculator/DripSimulator';
 import DividendCalendar from '@/components/calculator/DividendCalendar';
+import QuickGuideModal from '@/components/calculator/QuickGuideModal';
 import SavePortfolioModal from '@/components/auth/SavePortfolioModal';
 import AdminDashboardModal from '@/components/admin/AdminDashboardModal';
 import Header from '@/components/layout/Header';
@@ -32,6 +35,7 @@ export default function Home() {
   >('reverse');
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [isAdminModalOpen, setIsAdminModalOpen] = useState(false);
+  const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
 
   const scrollToSection = (
     tab: 'reverse' | 'compare' | 'timemachine' | 'barbell' | 'drip' | 'calendar'
@@ -154,6 +158,7 @@ export default function Home() {
         onTabSelect={scrollToSection}
         onOpenSaveModal={() => setIsSaveModalOpen(true)}
         onOpenAdminModal={() => setIsAdminModalOpen(true)}
+        onOpenGuideModal={() => setIsGuideModalOpen(true)}
       />
 
       {/* 메인 히어로 섹션 */}
@@ -197,6 +202,37 @@ export default function Home() {
 
         {/* 인터랙티브 탭 & 툴 섹션 */}
         <section id="interactive-tools" className="scroll-mt-24 space-y-6">
+          {/* 6대 계산기 초간단 활용 가이드 알림 배너 */}
+          <div className="max-w-4xl mx-auto bg-gradient-to-r from-amber-500/10 via-amber-400/10 to-income/10 border border-amber-300/40 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+            <div className="flex items-center gap-3.5 text-center sm:text-left">
+              <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <Lightbulb className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 justify-center sm:justify-start">
+                  <span className="font-extrabold text-sm sm:text-base text-brand-primary">
+                    처음 방문하셨나요? 6대 계산기 200% 활용 가이드
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300/50">
+                    초보자 필수
+                  </span>
+                </div>
+                <p className="text-xs text-brand-muted mt-0.5">
+                  내 투자 상황에 딱 맞는 계산기 선택 기준과 실전 꿀팁을 팝업으로 쉽고 빠르게 확인하세요.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsGuideModalOpen(true)}
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-brand-primary hover:bg-brand-dark text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5 shrink-0 group cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <span>활용 가이드 열기</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </button>
+          </div>
+
           {/* 상단 탭 네비게이션 */}
           <div className="flex justify-center">
             <div className="inline-flex flex-wrap justify-center p-1.5 bg-brand-secondary/70 rounded-2xl border border-subtle-border shadow-xs gap-1">
@@ -462,6 +498,14 @@ export default function Home() {
         isOpen={isAdminModalOpen}
         onClose={() => setIsAdminModalOpen(false)}
         isSupabaseConfigured={isSupabaseConfigured}
+      />
+
+      {/* 6대 계산기 초간단 활용 가이드 모달 */}
+      <QuickGuideModal
+        isOpen={isGuideModalOpen}
+        onClose={() => setIsGuideModalOpen(false)}
+        onSelectTab={scrollToSection}
+        defaultTab={activeTab}
       />
     </div>
   );

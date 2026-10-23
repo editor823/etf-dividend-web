@@ -14,6 +14,7 @@ import {
   Info,
   Menu,
   X,
+  Lightbulb,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/auth-context';
 
@@ -30,6 +31,7 @@ interface HeaderProps {
   onTabSelect?: (tab: CalculatorTab) => void;
   onOpenSaveModal?: () => void;
   onOpenAdminModal?: () => void;
+  onOpenGuideModal?: () => void;
 }
 
 export default function Header({
@@ -37,6 +39,7 @@ export default function Header({
   onTabSelect,
   onOpenSaveModal,
   onOpenAdminModal,
+  onOpenGuideModal,
 }: HeaderProps) {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
@@ -137,6 +140,18 @@ export default function Header({
               <Info className="w-3.5 h-3.5" />
               <span>사이트 소개</span>
             </Link>
+
+            {onOpenGuideModal && (
+              <button
+                type="button"
+                onClick={onOpenGuideModal}
+                className="px-3 py-1.5 rounded-xl text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100/80 transition-all flex items-center gap-1.5 border border-amber-200/60 shadow-2xs cursor-pointer"
+                title="6대 계산기 초간단 사용법 및 활용 꿀팁 보기"
+              >
+                <Lightbulb className="w-3.5 h-3.5 text-amber-600" />
+                <span>계산기 사용법</span>
+              </button>
+            )}
           </nav>
 
           {/* 구분선 */}
@@ -288,6 +303,25 @@ export default function Header({
               </span>
               <span className="text-[10px] text-brand-muted">E-E-A-T</span>
             </Link>
+
+            {onOpenGuideModal && (
+              <button
+                type="button"
+                onClick={() => {
+                  onOpenGuideModal();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center justify-between p-3 rounded-xl text-xs font-bold bg-amber-50 border border-amber-200/80 text-amber-900 hover:bg-amber-100/80 transition-colors shadow-2xs"
+              >
+                <span className="flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4 text-amber-600" />
+                  <span>💡 6대 계산기 초간단 활용 가이드</span>
+                </span>
+                <span className="text-[10px] bg-amber-200/80 text-amber-900 font-bold px-2 py-0.5 rounded-full">
+                  도움말
+                </span>
+              </button>
+            )}
 
             {/* 6대 핵심 배당 계산기 바로가기 (어느 페이지에서든 접근 가능) */}
             <div className="pt-2">
