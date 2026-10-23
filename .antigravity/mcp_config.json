@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "yfinance": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-yfinance"
+      ]
+    }
+  }
+}
