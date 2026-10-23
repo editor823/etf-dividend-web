@@ -8,17 +8,17 @@ import { TICKER_SCHEDULES } from '@/lib/calculator/dividend-calendar';
  */
 const FALLBACK_TICKERS: Ticker[] = Object.values(POPULAR_ETFS).map((etf) => ({
   ticker: etf.ticker,
-  name: etf.name,
+  name: etf.nameKo ? `${etf.nameKo} (${etf.name})` : etf.name,
   current_price: etf.currentPrice,
   dividend_yield: etf.dividendYield,
-  dividend_growth_5y: etf.ticker === 'SCHD' ? 0.0892 : etf.ticker === 'JEPI' ? 0.051 : 0.062,
-  capital_growth_est: etf.ticker === 'SCHD' ? 0.055 : 0.03,
-  expense_ratio: etf.ticker === 'SCHD' ? 0.0006 : 0.0035,
+  dividend_growth_5y: etf.dividendGrowth5y,
+  capital_growth_est: 0.05,
+  expense_ratio: etf.expenseRatio,
   frequency: etf.frequency,
-  pay_months: etf.frequency === 'monthly' ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] : [3, 6, 9, 12],
-  five_year_return: etf.ticker === 'SCHD' ? 0.564 : 0.382,
+  pay_months: etf.payMonths,
+  five_year_return: etf.fiveYearReturn,
   category: etf.category,
-  inception_date: '2011-10-20',
+  inception_date: '2015-01-01',
   updated_at: new Date().toISOString(),
 }));
 

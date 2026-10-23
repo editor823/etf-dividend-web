@@ -1,9 +1,12 @@
+import { ETF_DATABASE } from '@/lib/data/etf-database';
+
 /**
  * ETF 상세 비교 데이터 인터페이스
  */
 export interface ETFComparisonData {
   ticker: string;
   name: string;
+  nameKo?: string;
   category: string;
   currentPrice: number; // USD
   dividendYield: number; // 예: 0.0348 (3.48%)
@@ -14,166 +17,136 @@ export interface ETFComparisonData {
   frequencyLabel: '월배당' | '분기배당';
   distributionDay: string; // "매월 초", "3/6/9/12월 말" 등
   targetAudience: string; // "3040 장기 배당성장형" 등
-  pros: string[]; // 장점 3가지
-  cons: string[]; // 주의점 2가지
+  pros: string[]; // 장점
+  cons: string[]; // 주의점
   summaryGuide: string; // 상세 가이드 요약
 }
 
 /**
- * 비교 분석에 사용되는 프리셋 ETF 마스터 데이터셋
+ * 기본 17종 ETF 데이터셋 빌드 (마스터 DB 기반 확장)
  */
-export const COMPARISON_ETFS: Record<string, ETFComparisonData> = {
-  SCHD: {
-    ticker: 'SCHD',
-    name: 'Schwab U.S. Dividend Equity ETF',
-    category: '배당성장',
-    currentPrice: 82.5,
-    dividendYield: 0.0348,
-    dividendGrowth5y: 0.0892, // 8.92% (연평균 배당성장률 압도적)
-    expenseRatio: 0.0006, // 0.06% (매우 저렴)
-    fiveYearReturn: 0.564, // 56.4%
-    frequency: 'quarterly',
-    frequencyLabel: '분기배당',
-    distributionDay: '3, 6, 9, 12월 말',
-    targetAudience: '3040 적립식 배당성장 & 10년 이상 장기 투자자',
-    pros: [
-      '연평균 약 9%에 달하는 강력한 5년 배당성장률',
-      '0.06%의 매우 저렴한 운용보수로 장기 보유에 유리',
-      '우량 대형 가치주 중심으로 시장 하락 방어력 우수',
-    ],
-    cons: [
-      '분기별(3개월) 지급으로 당장 매월 생활비 수령에는 불편',
-      '고배당 커버드콜 대비 초기 진입 시점의 배당률(3.5%)은 낮은 편',
-    ],
-    summaryGuide:
-      '당장의 현금 인출보다는 5~10년 후 눈덩이처럼 불어날 배당금 증가를 노리는 적립식 청년·중장년 투자자에게 최적입니다.',
-  },
-  JEPI: {
-    ticker: 'JEPI',
-    name: 'JPMorgan Equity Premium Income ETF',
-    category: '고배당 커버드콜',
-    currentPrice: 57.8,
-    dividendYield: 0.0742, // 7.42%
-    dividendGrowth5y: 0.051, // 5.10%
-    expenseRatio: 0.0035, // 0.35%
-    fiveYearReturn: 0.382, // 38.2%
-    frequency: 'monthly',
-    frequencyLabel: '월배당',
-    distributionDay: '매월 1~5일 전후',
-    targetAudience: '은퇴 생활자 & 즉각적인 월급 대체 현금흐름 선호자',
-    pros: [
-      '연 7~8%대의 풍부한 월배당으로 확실한 제2의 월급 창출',
-      '매월 1일 지급으로 월 생활비 및 고정 지출 결제에 이상적',
-      'S&P 500 저변동성 주식 기반으로 완만한 하락 방어',
-    ],
-    cons: [
-      '커버드콜 옵션 구조상 강세장에서 주가 상승 상단이 제한됨',
-      'SCHD 대비 다소 높은 운용보수(0.35%)',
-    ],
-    summaryGuide:
-      '주가 급등보다는 매월 통장에 꽂히는 안정적인 7%대 월배당으로 생활비를 충당하고 싶은 은퇴 및 파이어(FIRE)족에게 추천합니다.',
-  },
-  JEPQ: {
-    ticker: 'JEPQ',
-    name: 'JPMorgan Nasdaq Equity Premium Income ETF',
-    category: '기술주 고배당 커버드콜',
-    currentPrice: 55.2,
-    dividendYield: 0.092, // 9.20%
-    dividendGrowth5y: 0.062, // 6.20%
-    expenseRatio: 0.0035, // 0.35%
-    fiveYearReturn: 0.445, // 44.5%
-    frequency: 'monthly',
-    frequencyLabel: '월배당',
-    distributionDay: '매월 1~5일 전후',
-    targetAudience: '초고배당 인컴 & 나스닥 기술주 동시 노출 선호자',
-    pros: [
-      '연 9~10% 수준의 압도적인 초고인컴 월배당 제공',
-      '나스닥 100 대형 기술주(애플, MS 등)를 기초자산으로 보유',
-      '높은 배당 재투자를 통해 자산 회수 기간 단축 가능',
-    ],
-    cons: [
-      '기술주 중심이라 나스닥 하락장 시 JEPI보다 원금 변동성이 큼',
-      '주가 상방 캡(Cap)으로 인해 QQQ 대비 상승 폭은 제한적',
-    ],
-    summaryGuide:
-      'JEPI의 안정성보다 더 강력한 9%대 초고배당을 원하며, 나스닥 성장주 흐름에 함께 올라타고 싶은 적극적인 인컴 투자자에게 맞춤입니다.',
-  },
-  VOO: {
-    ticker: 'VOO',
-    name: 'Vanguard S&P 500 ETF',
-    category: '시장지수',
-    currentPrice: 535.0,
-    dividendYield: 0.0132, // 1.32%
-    dividendGrowth5y: 0.058, // 5.80%
-    expenseRatio: 0.0003, // 0.03% (최저 수준)
-    fiveYearReturn: 0.986, // 98.6%
-    frequency: 'quarterly',
-    frequencyLabel: '분기배당',
-    distributionDay: '3, 6, 9, 12월 말',
-    targetAudience: '미국 경제 전체에 투자하는 자본 성장 중심 장기 투자자',
-    pros: [
-      '5년 주가 수익률 약 98%로 강력한 자본 차익(Capital Gain)',
-      '0.03%의 사실상 무료에 가까운 업계 최저 운용보수',
-      '미국 상위 500대 기업 전체에 분산 투자되는 절대적 안정성',
-    ],
-    cons: [
-      '1.3% 수준의 낮은 시가배당률로 당장의 현금흐름 창출에는 한계',
-      '배당금만으로 생활비를 조달하려면 막대한 자본금 필요',
-    ],
-    summaryGuide:
-      '현재 현금 인출보다는 전체 자산 덩어리(원금)를 가장 안전하고 빠르게 키우고 싶은 정석 자산 배분 투자자에게 정답입니다.',
-  },
-  QQQ: {
-    ticker: 'QQQ',
-    name: 'Invesco QQQ Trust',
-    category: '기술주 성장지수',
-    currentPrice: 490.0,
-    dividendYield: 0.0055, // 0.55%
-    dividendGrowth5y: 0.074, // 7.40%
-    expenseRatio: 0.002, // 0.20%
-    fiveYearReturn: 1.452, // 145.2%
-    frequency: 'quarterly',
-    frequencyLabel: '분기배당',
-    distributionDay: '4, 7, 10, 12월 말',
-    targetAudience: '인컴보다 오직 폭발적인 주가 상승을 추구하는 성장주 투자자',
-    pros: [
-      '5년 수익률 145%로 압도적인 자본 성장률',
-      '빅테크 및 AI 혁신 산업 성장의 직접적 수혜',
-      '장기 우상향 추세가 가장 강력한 지수',
-    ],
-    cons: [
-      '배당률 0.5%대로 현금흐름 수령 목적에는 부적합',
-      '경기 침체나 금리 인상 시 하락폭이 큼',
-    ],
-    summaryGuide:
-      '현금흐름보다는 시세 차익이 주 목표인 경우 적합하며, 배당 포트폴리오의 서브 성장 엔진으로 활용할 수 있습니다.',
-  },
-  DIVO: {
-    ticker: 'DIVO',
-    name: 'Amplify C-PACE ETF',
-    category: '배당성장 커버드콜',
-    currentPrice: 40.5,
-    dividendYield: 0.0465, // 4.65%
-    dividendGrowth5y: 0.048, // 4.80%
-    expenseRatio: 0.0055, // 0.55%
-    fiveYearReturn: 0.483, // 48.3%
-    frequency: 'monthly',
-    frequencyLabel: '월배당',
-    distributionDay: '매월 말일',
-    targetAudience: 'SCHD의 배당성장 + JEPI의 월배당 장점을 절충하고 싶은 투자자',
-    pros: [
-      '4.5~5% 수준의 탄탄한 월배당 지급',
-      '전술적 선별 옵션 매도로 주가 상승 참여율이 일반 커버드콜보다 높음',
-      '우량 대형 배당성장주 중심 편입',
-    ],
-    cons: [
-      '운용보수 0.55%로 비교 ETF 중 다소 높은 편',
-      'JEPI 대비 배당률은 낮고 SCHD 대비 배당성장은 낮음',
-    ],
-    summaryGuide:
-      'SCHD의 분기배당이 아쉽고 JEPI의 주가 상승 제한이 아쉬울 때, 월배당과 주가 성장을 동시에 노리는 징검다리 ETF로 제격입니다.',
-  },
-};
+export const COMPARISON_ETFS: Record<string, ETFComparisonData> = Object.fromEntries(
+  Object.values(ETF_DATABASE).map((etf) => {
+    // 세부 불릿 포인트 커스텀 (대표 종목 및 신규 종목)
+    const customPros: Record<string, string[]> = {
+      SCHD: [
+        '연평균 약 9%에 달하는 강력한 5년 배당성장률',
+        '0.06%의 매우 저렴한 운용보수로 장기 복리 극대화',
+        '우량 대형 가치주 중심으로 시장 하락 방어력 우수',
+      ],
+      JEPI: [
+        '연 7~8%대의 풍부한 월배당으로 확실한 제2의 월급 창출',
+        '매월 1일 지급으로 월 생활비 및 고정 지출 결제에 이상적',
+        'S&P 500 저변동성 주식 기반으로 완만한 하락 방어',
+      ],
+      JEPQ: [
+        '연 9~10% 수준의 압도적인 초고인컴 월배당 제공',
+        '나스닥 100 대형 기술주를 기초자산으로 보유하여 성장 일부 향유',
+        '높은 배당 재투자를 통해 자산 회수 기간 단축 가능',
+      ],
+      VOO: [
+        '5년 주가 수익률 약 98%로 강력한 자본 차익(Capital Gain)',
+        '0.03%의 사실상 무료에 가까운 업계 최저 운용보수',
+        '미국 상위 500대 기업 전체에 분산 투자되는 절대적 안정성',
+      ],
+      QQQ: [
+        '5년 수익률 145%로 압도적인 자본 성장률',
+        '빅테크 및 AI 혁신 산업 성장의 직접적 수혜',
+        '장기 우상향 추세가 가장 강력한 지수',
+      ],
+      SPYI: [
+        '연 11~12% 수준의 최고 수준 월배당 인컴 창출',
+        '옵션 스프레드 매매를 활용하여 S&P 500 상승분 일부 참여',
+        '미국 세법(Section 1256) 절세 최적화 전략 적용',
+      ],
+      O: [
+        '30년 연속 월배당을 증액해 온 미국 1위 상업용 리츠',
+        '매월 15일 꼬박꼬박 입금되는 안정적인 5.8%대 월세 수익',
+        '월마트, 세븐일레븐 등 우량 장기 임차인 포트폴리오',
+      ],
+      TLT: [
+        '미국 재무부가 보증하는 20년 이상 초장기 국채의 절대 안전성',
+        '금리 인하 사이클 도래 시 강력한 채권 가격 자본 차익 기대',
+        '주식 시장 폭락 시 훌륭한 포트폴리오 음의 상관관계 헷지',
+      ],
+      DGRO: [
+        '배당성향 75% 이하 기업 선별로 높은 배당 안전성과 연 9.4% 성장률',
+        '마이크로소프트, 애플 등 빅테크 우량주도 다수 편입',
+        '0.08%의 저렴한 운용보수로 장기 적립식 투자에 적합',
+      ],
+      VIG: [
+        '10년 연속 배당을 인상한 미국 대형 우량주 중심의 철벽 안전성',
+        '0.06%의 매우 낮은 운용보수와 극도로 낮은 주가 변동성',
+        '뱅가드의 철학이 담긴 정석 배당증액 포트폴리오',
+      ],
+    };
+
+    const customCons: Record<string, string[]> = {
+      SCHD: [
+        '분기별(3개월) 지급으로 당장 매월 생활비 수령에는 현금흐름 굴곡',
+        '고배당 커버드콜 대비 초기 진입 시점의 배당률(3.5%)은 평이함',
+      ],
+      JEPI: [
+        '커버드콜 옵션 구조상 강세장에서 주가 상승 상단이 제한됨',
+        'SCHD 대비 다소 높은 운용보수(0.35%)',
+      ],
+      JEPQ: [
+        '기술주 중심이라 나스닥 하락장 시 JEPI보다 원금 변동성이 큼',
+        '주가 상방 캡(Cap)으로 인해 QQQ 대비 상승 폭은 제한적',
+      ],
+      VOO: [
+        '1.3% 수준의 낮은 시가배당률로 당장의 현금흐름 창출에는 한계',
+        '배당금만으로 생활비를 조달하려면 막대한 자본금 필요',
+      ],
+      QQQ: [
+        '배당률 0.5%대로 현금흐름 수령 목적에는 부적합',
+        '경기 침체나 금리 인상 시 하락폭이 큼',
+      ],
+      SPYI: [
+        '운용보수(0.68%)가 다소 높은 편',
+        'JEPI/JEPQ 대비 신생 ETF로 장기 트랙레코드 확인 필요',
+      ],
+      O: [
+        '금리 급등 시 부동산 차입 비용 증가로 주가 조정 압력',
+        '개별 리츠 주식으로서의 공실률 리스크 존재',
+      ],
+      TLT: [
+        '듀레이션이 17년에 달해 금리 인상기 원금 손실 위험 매우 큼',
+        '인플레이션 지속 시 실질 구매력 보전 취약',
+      ],
+      DGRO: [
+        '시가배당률 2.2%대로 초기 현금 인컴 수령액은 낮은 편',
+        '배당보다는 배당성장 및 자본차익 중심',
+      ],
+      VIG: [
+        '시가배당률 1.7% 수준으로 인컴 목적 투자자에게는 매력 부족',
+        '주가 상승 탄력은 S&P 500 대비 다소 완만',
+      ],
+    };
+
+    return [
+      etf.ticker,
+      {
+        ticker: etf.ticker,
+        name: etf.name,
+        nameKo: etf.nameKo,
+        category: etf.category,
+        currentPrice: etf.currentPrice,
+        dividendYield: etf.dividendYield,
+        dividendGrowth5y: etf.dividendGrowth5y,
+        expenseRatio: etf.expenseRatio,
+        fiveYearReturn: etf.fiveYearReturn,
+        frequency: etf.frequency,
+        frequencyLabel: etf.frequencyLabel,
+        distributionDay: etf.payMonthsLabel,
+        targetAudience: etf.targetAudience,
+        pros: customPros[etf.ticker] || [etf.prosConsSummary.pros],
+        cons: customCons[etf.ticker] || [etf.prosConsSummary.cons],
+        summaryGuide: etf.description,
+      },
+    ];
+  })
+);
 
 /**
  * 지표별 비교 결과 인터페이스
@@ -188,7 +161,7 @@ export interface ComparisonMetricResult {
   formattedA: string;
   formattedB: string;
   winner: MetricWinner;
-  isExpense?: boolean; // 운용보수는 낮을수록 승리
+  isExpense?: boolean;
 }
 
 export interface ComparisonSummary {
@@ -201,9 +174,51 @@ export interface ComparisonSummary {
     return5y: ComparisonMetricResult;
     frequency: ComparisonMetricResult;
   };
-  scoreA: number; // A의 승리 항목 개수
-  scoreB: number; // B의 승리 항목 개수
+  scoreA: number;
+  scoreB: number;
   finalWinner: MetricWinner;
+}
+
+/**
+ * 1:1 골든크로스(배당 역전) 연도별 데이터 포인트
+ */
+export interface CrossoverYearData {
+  year: number; // 1 ~ 15년차
+  dividendAnnualUSD_A: number; // 세후 연간 배당금 ($)
+  dividendAnnualUSD_B: number;
+  dividendAnnualKRW_A: number; // 세후 연간 배당금 (₩)
+  dividendAnnualKRW_B: number;
+  dividendMonthlyKRW_A: number; // 세후 월평균 배당금 (₩)
+  dividendMonthlyKRW_B: number;
+  yocA: number; // 원금대비 배당수익률 (Yield on Cost)
+  yocB: number;
+  isCrossoverYear: boolean; // 역전이 발생한 바로 그 해인가?
+  winnerThisYear: 'A' | 'B' | 'TIE';
+}
+
+/**
+ * 1:1 초기 투자금 및 골든크로스 연산 결과 인터페이스
+ */
+export interface CrossoverBattleResult {
+  etfA: ETFComparisonData;
+  etfB: ETFComparisonData;
+  initialCapitalUSD: number;
+  initialCapitalKRW: number;
+  exchangeRate: number;
+
+  // 1년차 초기 배당 비교
+  initialAnnualNetUSD_A: number;
+  initialAnnualNetUSD_B: number;
+  initialMonthlyNetKRW_A: number;
+  initialMonthlyNetKRW_B: number;
+
+  // 골든크로스 분석 결과
+  crossoverYear: number | null; // 역전되는 연차 (1~15, 없으면 null)
+  crossoverOvertaker: 'A' | 'B' | null; // 추월하는 주체
+  crossoverSummaryText: string;
+
+  // 15개년 시계열 프로젝션
+  yearlyProjections: CrossoverYearData[];
 }
 
 /**
@@ -238,7 +253,7 @@ export function compareEtfs(tickerA: string, tickerB: string): ComparisonSummary
     scoreB++;
   }
 
-  // 3. 운용보수 (낮을수록 우위!)
+  // 3. 운용보수 (낮을수록 우위)
   let expenseWinner: MetricWinner = 'TIE';
   if (etfA.expenseRatio < etfB.expenseRatio) {
     expenseWinner = 'A';
@@ -280,7 +295,7 @@ export function compareEtfs(tickerA: string, tickerB: string): ComparisonSummary
     metrics: {
       yield: {
         label: '시가배당률 (Dividend Yield)',
-        description: '현재 주가 대비 1년 동안 지급받는 예상 배당금 비율',
+        description: '현재 주가 대비 1년 동안 지급받는 예상 세전 배당금 비율',
         valueA: etfA.dividendYield,
         valueB: etfB.dividendYield,
         formattedA: `${(etfA.dividendYield * 100).toFixed(2)}%`,
@@ -298,7 +313,7 @@ export function compareEtfs(tickerA: string, tickerB: string): ComparisonSummary
       },
       expense: {
         label: '운용보수 (Expense Ratio)',
-        description: '자산운용사에 매년 지불하는 수수료 (낮을수록 장기 수익률 유리)',
+        description: '자산운용사에 매년 지불하는 수수료 (낮을수록 장기 복리에 절대 유리)',
         valueA: etfA.expenseRatio,
         valueB: etfB.expenseRatio,
         formattedA: `${(etfA.expenseRatio * 100).toFixed(2)}%`,
@@ -325,5 +340,116 @@ export function compareEtfs(tickerA: string, tickerB: string): ComparisonSummary
         winner: freqWinner,
       },
     },
+  };
+}
+
+/**
+ * 초기 투자금 기반 배당성장 골든크로스(역전 시점) 정밀 연산 함수
+ */
+export function calculateCrossoverBattle(
+  tickerA: string,
+  tickerB: string,
+  initialCapitalAmount: number,
+  currency: 'KRW' | 'USD' = 'KRW',
+  exchangeRate = 1350
+): CrossoverBattleResult {
+  const etfA = COMPARISON_ETFS[tickerA] || COMPARISON_ETFS['SCHD'];
+  const etfB = COMPARISON_ETFS[tickerB] || COMPARISON_ETFS['JEPI'];
+
+  const initialCapitalUSD =
+    currency === 'USD' ? initialCapitalAmount : initialCapitalAmount / exchangeRate;
+  const initialCapitalKRW =
+    currency === 'KRW' ? initialCapitalAmount : initialCapitalAmount * exchangeRate;
+
+  const US_TAX_RATE = 0.15; // 15% 미국 원천징수 배당세
+
+  // 1년차 초기 세후 배당금
+  const initialAnnualNetUSD_A = initialCapitalUSD * etfA.dividendYield * (1 - US_TAX_RATE);
+  const initialAnnualNetUSD_B = initialCapitalUSD * etfB.dividendYield * (1 - US_TAX_RATE);
+
+  const initialMonthlyNetKRW_A = (initialAnnualNetUSD_A * exchangeRate) / 12;
+  const initialMonthlyNetKRW_B = (initialAnnualNetUSD_B * exchangeRate) / 12;
+
+  const growthA = etfA.dividendGrowth5y ?? 0.05;
+  const growthB = etfB.dividendGrowth5y ?? 0.05;
+
+  // 15개년 프로젝션 계산 및 골든크로스 탐색
+  const yearlyProjections: CrossoverYearData[] = [];
+  let crossoverYear: number | null = null;
+  let crossoverOvertaker: 'A' | 'B' | null = null;
+
+  // 1년차 초기 우위 판정
+  const initialWinner = initialAnnualNetUSD_A >= initialAnnualNetUSD_B ? 'A' : 'B';
+
+  for (let year = 1; year <= 15; year++) {
+    // 복리 배당성장 적용: Dividend(t) = Dividend(1) * (1 + growth)^(year - 1)
+    const annualNetA = initialAnnualNetUSD_A * Math.pow(1 + growthA, year - 1);
+    const annualNetB = initialAnnualNetUSD_B * Math.pow(1 + growthB, year - 1);
+
+    const annualNetKrwA = annualNetA * exchangeRate;
+    const annualNetKrwB = annualNetB * exchangeRate;
+
+    const monthlyNetKrwA = annualNetKrwA / 12;
+    const monthlyNetKrwB = annualNetKrwB / 12;
+
+    const yocA = (annualNetA / initialCapitalUSD) * 100;
+    const yocB = (annualNetB / initialCapitalUSD) * 100;
+
+    const currentWinner = annualNetA > annualNetB ? 'A' : annualNetB > annualNetA ? 'B' : 'TIE';
+
+    // 골든크로스 감지 (1년차 승자와 달라진 첫 번째 해)
+    let isCrossoverYear = false;
+    if (crossoverYear === null && year > 1 && currentWinner !== initialWinner && currentWinner !== 'TIE') {
+      crossoverYear = year;
+      crossoverOvertaker = currentWinner;
+      isCrossoverYear = true;
+    }
+
+    yearlyProjections.push({
+      year,
+      dividendAnnualUSD_A: annualNetA,
+      dividendAnnualUSD_B: annualNetB,
+      dividendAnnualKRW_A: annualNetKrwA,
+      dividendAnnualKRW_B: annualNetKrwB,
+      dividendMonthlyKRW_A: monthlyNetKrwA,
+      dividendMonthlyKRW_B: monthlyNetKrwB,
+      yocA,
+      yocB,
+      isCrossoverYear,
+      winnerThisYear: currentWinner,
+    });
+  }
+
+  // 결과 해설 요약 텍스트 생성
+  let crossoverSummaryText = '';
+  if (crossoverYear !== null && crossoverOvertaker !== null) {
+    const overtakerName = crossoverOvertaker === 'A' ? etfA.ticker : etfB.ticker;
+    const underdogName = crossoverOvertaker === 'A' ? etfB.ticker : etfA.ticker;
+    const overtakerGrowth =
+      crossoverOvertaker === 'A' ? (growthA * 100).toFixed(1) : (growthB * 100).toFixed(1);
+
+    crossoverSummaryText = `🚀 초기에는 ${underdogName}의 배당금이 더 많지만, ${overtakerName}의 강력한 배당성장률(+${overtakerGrowth}%)로 인해 투자 후 약 ${crossoverYear}년차에 연간 배당금이 역전(골든크로스)됩니다!`;
+  } else if (initialWinner === 'A' && growthA >= growthB) {
+    crossoverSummaryText = `👑 ${etfA.ticker}가 초기 배당률과 배당성장률 모두 ${etfB.ticker}보다 우세하여 15년 내내 배당금 우위를 유지합니다.`;
+  } else if (initialWinner === 'B' && growthB >= growthA) {
+    crossoverSummaryText = `👑 ${etfB.ticker}가 초기 배당률과 배당성장률 모두 ${etfA.ticker}보다 우세하여 15년 내내 배당금 우위를 유지합니다.`;
+  } else {
+    crossoverSummaryText = `⏳ 두 종목의 배당률 격차가 커서 15년 이내에는 역전이 발생하지 않으며, 각각 인컴 중심과 성장 중심으로 차별화됩니다.`;
+  }
+
+  return {
+    etfA,
+    etfB,
+    initialCapitalUSD,
+    initialCapitalKRW,
+    exchangeRate,
+    initialAnnualNetUSD_A,
+    initialAnnualNetUSD_B,
+    initialMonthlyNetKRW_A,
+    initialMonthlyNetKRW_B,
+    crossoverYear,
+    crossoverOvertaker,
+    crossoverSummaryText,
+    yearlyProjections,
   };
 }

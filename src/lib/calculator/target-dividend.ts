@@ -1,62 +1,14 @@
-/**
- * ETF 기본 정보 인터페이스
- */
-export interface ETFInfo {
-  ticker: string;
-  name: string;
-  category: '배당성장' | '고배당 커버드콜' | '시장지수';
-  currentPrice: number; // USD
-  dividendYield: number; // 시가배당률 (예: 0.0348 = 3.48%)
-  frequency: 'monthly' | 'quarterly';
-  frequencyLabel: '월배당' | '분기배당';
-  description: string;
-}
+import { ETF_DATABASE, ETFMasterData } from '@/lib/data/etf-database';
 
 /**
- * 기본 제공되는 핵심 미국 배당 ETF 데이터셋
+ * ETF 기본 정보 인터페이스 (확장 마스터 데이터 모델 연동)
  */
-export const POPULAR_ETFS: Record<string, ETFInfo> = {
-  SCHD: {
-    ticker: 'SCHD',
-    name: 'Schwab U.S. Dividend Equity ETF',
-    category: '배당성장',
-    currentPrice: 82.5,
-    dividendYield: 0.0348, // 3.48%
-    frequency: 'quarterly',
-    frequencyLabel: '분기배당',
-    description: '10년 연속 배당 증액 기업에 투자하는 대표 배당성장 ETF',
-  },
-  JEPI: {
-    ticker: 'JEPI',
-    name: 'JPMorgan Equity Premium Income ETF',
-    category: '고배당 커버드콜',
-    currentPrice: 57.8,
-    dividendYield: 0.0742, // 7.42%
-    frequency: 'monthly',
-    frequencyLabel: '월배당',
-    description: 'S&P 500 방어형 주식 + 커버드콜 옵션으로 매월 안정적인 고인컴 창출',
-  },
-  JEPQ: {
-    ticker: 'JEPQ',
-    name: 'JPMorgan Nasdaq Equity Premium Income ETF',
-    category: '고배당 커버드콜',
-    currentPrice: 55.2,
-    dividendYield: 0.092, // 9.20%
-    frequency: 'monthly',
-    frequencyLabel: '월배당',
-    description: '나스닥 100 기반 커버드콜 전략으로 연 9~10% 수준의 초고배당 추구',
-  },
-  VOO: {
-    ticker: 'VOO',
-    name: 'Vanguard S&P 500 ETF',
-    category: '시장지수',
-    currentPrice: 535.0,
-    dividendYield: 0.0132, // 1.32%
-    frequency: 'quarterly',
-    frequencyLabel: '분기배당',
-    description: '미국 500대 대표 기업 지수 추종, 장기 자본 성장 + 안정적 배당',
-  },
-};
+export type ETFInfo = ETFMasterData;
+
+/**
+ * 기본 제공되는 17종 핵심 미국 배당 및 지수 ETF/주식 데이터셋
+ */
+export const POPULAR_ETFS: Record<string, ETFInfo> = ETF_DATABASE;
 
 /**
  * 계산기 입력 파라미터

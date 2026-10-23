@@ -4,26 +4,31 @@ import React, { useState, useMemo } from 'react';
 import {
   PieChart,
   Shield,
-  Zap,
   RotateCcw,
 } from 'lucide-react';
 import {
   calculateBarbellPortfolio,
   BARBELL_PRESETS,
-  HighIncomePartner,
 } from '@/lib/calculator/barbell-optimizer';
+import { ETF_DATABASE } from '@/lib/data/etf-database';
 import { formatCurrency, formatPercent, formatNumber } from '@/lib/utils';
 import BarbellOptimizerGuide from './guides/BarbellOptimizerGuide';
 
 export default function BarbellOptimizer() {
-  const [schdWeight, setSchdWeight] = useState<number>(50); // 기본 50:50
-  const [partnerTicker, setPartnerTicker] = useState<HighIncomePartner>('JEPI');
+  const [growthTicker, setGrowthTicker] = useState<string>('SCHD');
+  const [incomeTicker, setIncomeTicker] = useState<string>('JEPI');
+  const [growthWeight, setGrowthWeight] = useState<number>(50); // 기본 50:50
   const [currency, setCurrency] = useState<'KRW' | 'USD'>('KRW');
   const [totalCapital, setTotalCapital] = useState<number>(50000000); // 기본 5,000만 원
   const [isReverseMode, setIsReverseMode] = useState<boolean>(false);
   const [targetMonthlyDividend, setTargetMonthlyDividend] = useState<number>(1000000); // 역산 목표 100만 원
 
   const exchangeRate = 1350;
+
+  // 성장 및 배당성장 후보군
+  const growthCandidates = ['SCHD', 'VOO', 'QQQ', 'VIG', 'DGRO', 'DIA', 'NOBL', 'VYM', 'HDV'];
+  // 고배당 커버드콜 및 월배당 인컴 후보군
+  const incomeCandidates = ['JEPI', 'JEPQ', 'SPYI', 'DIVO', 'O', 'MAIN', 'BST', 'TLT'];
 
   // 통화 전환 핸들러
   const handleCurrencyChange = (newCurrency: 'KRW' | 'USD') => {
@@ -41,16 +46,19 @@ export default function BarbellOptimizer() {
   // 포트폴리오 연산
   const result = useMemo(() => {
     return calculateBarbellPortfolio({
-      schdWeight,
-      partnerTicker,
+      growthTicker,
+      incomeTicker,
+      growthWeight,
       totalCapital,
       currency,
       exchangeRate,
       targetMonthlyDividend: isReverseMode ? targetMonthlyDividend : undefined,
     });
-  }, [schdWeight, partnerTicker, totalCapital, currency, exchangeRate, isReverseMode, targetMonthlyDividend]);
+  }, [growthTicker, incomeTicker, growthWeight, totalCapital, currency, exchangeRate, isReverseMode, targetMonthlyDividend]);
 
-  const partnerWeight = 100 - schdWeight;
+  const incomeWeight = 100 - growthWeight;
+  const growthEtf = ETF_DATABASE[growthTicker] || ETF_DATABASE['SCHD'];
+  const incomeEtf = ETF_DATABASE[incomeTicker] || ETF_DATABASE['JEPI'];
 
   return (
     <div className="w-full bg-white rounded-3xl border border-subtle-border shadow-elevated p-6 sm:p-8 lg:p-10 space-y-8">
@@ -59,13 +67,13 @@ export default function BarbellOptimizer() {
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-secondary text-brand-primary text-xs font-semibold mb-2">
             <PieChart className="w-3.5 h-3.5 text-income" />
-            <span>기능 4: SCHD + JEPI/JEPQ 바벨 전략</span>
+            <span>기능 4: 맞춤형 배당 바벨 전략</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-brand-primary tracking-tight">
             배당 바벨 포트폴리오 최적화기
           </h2>
           <p className="text-sm text-brand-muted mt-1">
-            자본성장 엔진(SCHD)과 고인컴 캐시카우(JEPI/JEPQ)의 비중을 조절하여 나만의 이상적인 현금흐름 밸런스를 찾습니다.
+            <strong className="text-brand-primary">시장지수/성장 엔진</strong>과 <strong className="text-income">고배당 커버드콜</strong>의 비중 슬라이더를 조절하여 합성 배당률과 매월 세후 현금흐름을 최적화합니다.
           </p>
         </div>
 
@@ -103,12 +111,12 @@ export default function BarbellOptimizer() {
         </span>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {BARBELL_PRESETS.map((preset) => {
-            const isSelected = schdWeight === preset.schdWeight;
+            const isSelected = growthWeight === preset.growthWeight;
             return (
               <button
                 key={preset.id}
                 type="button"
-                onClick={() => setSchdWeight(preset.schdWeight)}
+                onClick={() => setGrowthWeight(preset.growthWeight)}
                 className={`p-4 rounded-2xl border text-left transition-all relative flex flex-col justify-between ${
                   isSelected
                     ? 'border-brand-primary bg-brand-primary text-white shadow-md ring-2 ring-brand-primary/20'
@@ -145,63 +153,85 @@ export default function BarbellOptimizer() {
         </div>
       </div>
 
-      {/* 3. 비중 슬라이더 & 파트너 종목 선택 */}
+      {/* 3. 종목 선택 및 비중 슬라이더 조절 패널 */}
       <div className="p-6 bg-brand-bg rounded-3xl border border-subtle-border space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h3 className="text-base font-bold text-brand-primary flex items-center gap-2">
-              <Zap className="w-4 h-4 text-income" />
-              포트폴리오 비중 커스텀 조절
-            </h3>
-            <p className="text-xs text-brand-muted mt-0.5">
-              슬라이더를 좌우로 움직여 SCHD와 고인컴 ETF의 비율을 1% 단위로 정밀하게 조정하세요.
+        {/* 양날개 종목 선택기 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* 좌측: 성장/배당성장 종목 선택 */}
+          <div className="bg-white p-4 rounded-2xl border border-subtle-border space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-xs font-bold text-brand-primary flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-brand-primary inline-block" />
+                성장 / 시장지수 / 배당성장
+              </span>
+              <span className="text-xs text-income font-bold num-font">
+                {formatPercent(growthEtf.dividendYield)}
+              </span>
+            </div>
+            <select
+              value={growthTicker}
+              onChange={(e) => setGrowthTicker(e.target.value)}
+              className="w-full px-3 py-2 bg-brand-bg rounded-xl border border-subtle-border text-sm font-bold text-brand-primary focus:outline-none focus:ring-2 focus:ring-income"
+            >
+              {growthCandidates.map((ticker) => {
+                const item = ETF_DATABASE[ticker];
+                return (
+                  <option key={ticker} value={ticker}>
+                    {ticker} - {item.nameKo || item.name} ({formatPercent(item.dividendYield)})
+                  </option>
+                );
+              })}
+            </select>
+            <p className="text-[11px] text-brand-muted truncate">
+              {growthEtf.description}
             </p>
           </div>
 
-          {/* 고인컴 파트너 선택 (JEPI vs JEPQ) */}
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-brand-muted">고인컴 파트너:</span>
-            <div className="inline-flex p-1 bg-white rounded-xl border border-subtle-border">
-              <button
-                type="button"
-                onClick={() => setPartnerTicker('JEPI')}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                  partnerTicker === 'JEPI'
-                    ? 'bg-income text-white shadow-2xs'
-                    : 'text-brand-muted hover:text-brand-primary'
-                }`}
-              >
-                JEPI (7.4%)
-              </button>
-              <button
-                type="button"
-                onClick={() => setPartnerTicker('JEPQ')}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                  partnerTicker === 'JEPQ'
-                    ? 'bg-income text-white shadow-2xs'
-                    : 'text-brand-muted hover:text-brand-primary'
-                }`}
-              >
-                JEPQ (9.2%)
-              </button>
+          {/* 우측: 고배당 커버드콜 / 월배당 인컴 종목 선택 */}
+          <div className="bg-white p-4 rounded-2xl border border-subtle-border space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-xs font-bold text-income flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-income inline-block" />
+                고배당 커버드콜 / 월배당 인컴
+              </span>
+              <span className="text-xs text-income font-bold num-font">
+                {formatPercent(incomeEtf.dividendYield)}
+              </span>
             </div>
+            <select
+              value={incomeTicker}
+              onChange={(e) => setIncomeTicker(e.target.value)}
+              className="w-full px-3 py-2 bg-brand-bg rounded-xl border border-subtle-border text-sm font-bold text-brand-primary focus:outline-none focus:ring-2 focus:ring-income"
+            >
+              {incomeCandidates.map((ticker) => {
+                const item = ETF_DATABASE[ticker];
+                return (
+                  <option key={ticker} value={ticker}>
+                    {ticker} - {item.nameKo || item.name} ({formatPercent(item.dividendYield)})
+                  </option>
+                );
+              })}
+            </select>
+            <p className="text-[11px] text-brand-muted truncate">
+              {incomeEtf.description}
+            </p>
           </div>
         </div>
 
         {/* 대형 비중 게이지 바 */}
-        <div className="space-y-3">
+        <div className="space-y-3 pt-2">
           <div className="flex justify-between items-baseline">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-brand-primary inline-block" />
               <span className="font-extrabold text-brand-primary text-base">
-                SCHD {schdWeight}%
+                {growthTicker} {growthWeight}%
               </span>
-              <span className="text-xs text-brand-muted">(자본성장형)</span>
+              <span className="text-xs text-brand-muted">({growthEtf.category})</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-brand-muted">(고인컴 월배당)</span>
+              <span className="text-xs text-brand-muted">({incomeEtf.category})</span>
               <span className="font-extrabold text-income text-base">
-                {partnerTicker} {partnerWeight}%
+                {incomeTicker} {incomeWeight}%
               </span>
               <span className="w-3 h-3 rounded-full bg-income inline-block" />
             </div>
@@ -211,22 +241,22 @@ export default function BarbellOptimizer() {
           <div className="w-full h-4 rounded-full overflow-hidden flex bg-subtle-border shadow-inner">
             <div
               className="bg-brand-primary transition-all duration-200"
-              style={{ width: `${schdWeight}%` }}
+              style={{ width: `${growthWeight}%` }}
             />
             <div
               className="bg-income transition-all duration-200"
-              style={{ width: `${partnerWeight}%` }}
+              style={{ width: `${incomeWeight}%` }}
             />
           </div>
 
-          {/* 실제 슬라이더 조작 인풋 */}
+          {/* 슬라이더 조작 인풋 */}
           <input
             type="range"
             min="0"
             max="100"
             step="1"
-            value={schdWeight}
-            onChange={(e) => setSchdWeight(Number(e.target.value))}
+            value={growthWeight}
+            onChange={(e) => setGrowthWeight(Number(e.target.value))}
             className="w-full accent-brand-primary cursor-pointer"
           />
 
@@ -265,7 +295,7 @@ export default function BarbellOptimizer() {
             <RotateCcw className="w-4 h-4 text-income" />
             <div className="text-xs">
               <span className="font-bold text-brand-primary block">목표 월 배당 역산</span>
-              <span className="text-[11px] text-brand-muted">이 비중으로 월 N원 받으려면?</span>
+              <span className="text-[11px] text-brand-muted">이 바벨 비중으로 월 N원 받으려면?</span>
             </div>
             <button
               type="button"
@@ -281,7 +311,7 @@ export default function BarbellOptimizer() {
 
         {/* 역산 모드 활성화 시 입력 박스 */}
         {isReverseMode && (
-          <div className="p-4 bg-income-light/50 rounded-2xl border border-income/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fadeIn">
+          <div className="p-4 bg-income-light/50 rounded-2xl border border-income/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in duration-200">
             <div>
               <span className="text-xs font-bold text-brand-primary block">
                 희망하는 매월 세후 실수령 배당금
@@ -312,17 +342,17 @@ export default function BarbellOptimizer() {
         {/* 복합 배당수익률 */}
         <div className="bg-gradient-to-br from-income to-income-dark text-white rounded-2xl p-6 shadow-card space-y-2">
           <div className="flex items-center justify-between text-xs text-white/80">
-            <span>포트폴리오 복합 배당률</span>
+            <span>포트폴리오 합성 배당률</span>
             <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-bold">
-              연간 기대치
+              연간 세전 기대치
             </span>
           </div>
           <div className="text-3xl sm:text-4xl font-black num-font">
             {formatPercent(result.combinedDividendYield)}
           </div>
           <p className="text-xs text-white/80">
-            SCHD({(result.holdings.schd.dividendYield * 100).toFixed(1)}%) + {partnerTicker}(
-            {(result.holdings.partner.dividendYield * 100).toFixed(1)}%) 가중평균
+            {growthTicker}({(growthEtf.dividendYield * 100).toFixed(1)}%) + {incomeTicker}(
+            {(incomeEtf.dividendYield * 100).toFixed(1)}%) 가중평균
           </p>
         </div>
 
@@ -331,14 +361,14 @@ export default function BarbellOptimizer() {
           <div className="flex items-center justify-between text-xs text-white/80">
             <span>복합 5년 배당성장률 (CAGR)</span>
             <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-bold">
-              물가방어력
+              물가 방어력
             </span>
           </div>
           <div className="text-3xl sm:text-4xl font-black num-font text-income-light">
             +{formatPercent(result.combinedDividendGrowth5y)}
           </div>
           <p className="text-xs text-white/80">
-            SCHD의 강력한 성장 엔진으로 장기 배당금 매년 증가
+            {growthTicker}의 성장 엔진으로 시간이 갈수록 배당금 증가
           </p>
         </div>
 
@@ -388,17 +418,17 @@ export default function BarbellOptimizer() {
               </div>
             </div>
             <div className="p-3 bg-white/10 rounded-xl border border-white/10">
-              <span className="text-[11px] text-white/70 block">필요 SCHD 주식 수</span>
+              <span className="text-[11px] text-white/70 block">필요 {growthTicker} 주식 수</span>
               <span className="text-lg font-bold num-font text-white">
-                {formatNumber(result.reverseCalculation.requiredSchdShares)}주
+                {formatNumber(result.reverseCalculation.requiredGrowthShares)}주
               </span>
             </div>
             <div className="p-3 bg-white/10 rounded-xl border border-white/10">
               <span className="text-[11px] text-white/70 block">
-                필요 {partnerTicker} 주식 수
+                필요 {incomeTicker} 주식 수
               </span>
               <span className="text-lg font-bold num-font text-income-light">
-                {formatNumber(result.reverseCalculation.requiredPartnerShares)}주
+                {formatNumber(result.reverseCalculation.requiredIncomeShares)}주
               </span>
             </div>
           </div>
@@ -413,30 +443,30 @@ export default function BarbellOptimizer() {
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* SCHD 카드 */}
+          {/* 성장 자산 카드 */}
           <div className="bg-brand-bg rounded-2xl p-6 border border-subtle-border space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xl font-black text-brand-primary">SCHD</span>
+                  <span className="text-xl font-black text-brand-primary">{growthTicker}</span>
                   <span className="text-xs px-2 py-0.5 rounded bg-brand-primary text-white font-bold">
-                    {result.schdWeight}%
+                    {result.growthWeight}%
                   </span>
                 </div>
                 <p className="text-xs text-brand-muted mt-0.5">
-                  {result.holdings.schd.name}
+                  {result.holdings.growth.name}
                 </p>
               </div>
               <div className="text-right">
                 <span className="text-xs text-brand-muted block">현재가</span>
                 <span className="text-sm font-bold num-font text-brand-primary">
-                  ${result.holdings.schd.currentPrice.toFixed(2)}
+                  ${result.holdings.growth.currentPrice.toFixed(2)}
                 </span>
               </div>
             </div>
 
             <div className="p-3.5 bg-white rounded-xl border border-subtle-border/80 text-xs text-brand-muted">
-              {result.holdings.schd.role}
+              {result.holdings.growth.role}
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-xs">
@@ -444,14 +474,14 @@ export default function BarbellOptimizer() {
                 <span className="text-brand-muted block mb-0.5">배분 투자금</span>
                 <strong className="num-font text-brand-primary text-sm">
                   {currency === 'KRW'
-                    ? formatCurrency(result.holdings.schd.allocatedCapitalKRW, 'KRW')
-                    : formatCurrency(result.holdings.schd.allocatedCapitalUSD, 'USD')}
+                    ? formatCurrency(result.holdings.growth.allocatedCapitalKRW, 'KRW')
+                    : formatCurrency(result.holdings.growth.allocatedCapitalUSD, 'USD')}
                 </strong>
               </div>
               <div className="bg-white p-3 rounded-xl border border-subtle-border/80">
                 <span className="text-brand-muted block mb-0.5">권장 매수 주수</span>
                 <strong className="num-font text-brand-primary text-sm">
-                  {formatNumber(result.holdings.schd.sharesToBuy)}주
+                  {formatNumber(result.holdings.growth.sharesToBuy)}주
                 </strong>
               </div>
             </div>
@@ -460,38 +490,38 @@ export default function BarbellOptimizer() {
               <span className="text-brand-muted">월 실수령 배당금</span>
               <strong className="num-font text-income text-sm">
                 {currency === 'KRW'
-                  ? formatCurrency(result.holdings.schd.monthlyNetDividendKRW, 'KRW')
-                  : formatCurrency(result.holdings.schd.monthlyNetDividendUSD, 'USD')}
+                  ? formatCurrency(result.holdings.growth.monthlyNetDividendKRW, 'KRW')
+                  : formatCurrency(result.holdings.growth.monthlyNetDividendUSD, 'USD')}
               </strong>
             </div>
           </div>
 
-          {/* 고인컴 파트너 (JEPI 또는 JEPQ) 카드 */}
+          {/* 고인컴 자산 카드 */}
           <div className="bg-brand-bg rounded-2xl p-6 border border-subtle-border space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-xl font-black text-income">
-                    {result.holdings.partner.ticker}
+                    {incomeTicker}
                   </span>
                   <span className="text-xs px-2 py-0.5 rounded bg-income text-white font-bold">
-                    {result.partnerWeight}%
+                    {result.incomeWeight}%
                   </span>
                 </div>
                 <p className="text-xs text-brand-muted mt-0.5">
-                  {result.holdings.partner.name}
+                  {result.holdings.income.name}
                 </p>
               </div>
               <div className="text-right">
                 <span className="text-xs text-brand-muted block">현재가</span>
                 <span className="text-sm font-bold num-font text-brand-primary">
-                  ${result.holdings.partner.currentPrice.toFixed(2)}
+                  ${result.holdings.income.currentPrice.toFixed(2)}
                 </span>
               </div>
             </div>
 
             <div className="p-3.5 bg-white rounded-xl border border-subtle-border/80 text-xs text-brand-muted">
-              {result.holdings.partner.role}
+              {result.holdings.income.role}
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-xs">
@@ -499,14 +529,14 @@ export default function BarbellOptimizer() {
                 <span className="text-brand-muted block mb-0.5">배분 투자금</span>
                 <strong className="num-font text-brand-primary text-sm">
                   {currency === 'KRW'
-                    ? formatCurrency(result.holdings.partner.allocatedCapitalKRW, 'KRW')
-                    : formatCurrency(result.holdings.partner.allocatedCapitalUSD, 'USD')}
+                    ? formatCurrency(result.holdings.income.allocatedCapitalKRW, 'KRW')
+                    : formatCurrency(result.holdings.income.allocatedCapitalUSD, 'USD')}
                 </strong>
               </div>
               <div className="bg-white p-3 rounded-xl border border-subtle-border/80">
                 <span className="text-brand-muted block mb-0.5">권장 매수 주수</span>
                 <strong className="num-font text-brand-primary text-sm">
-                  {formatNumber(result.holdings.partner.sharesToBuy)}주
+                  {formatNumber(result.holdings.income.sharesToBuy)}주
                 </strong>
               </div>
             </div>
@@ -515,8 +545,8 @@ export default function BarbellOptimizer() {
               <span className="text-brand-muted">월 실수령 배당금</span>
               <strong className="num-font text-income text-sm">
                 {currency === 'KRW'
-                  ? formatCurrency(result.holdings.partner.monthlyNetDividendKRW, 'KRW')
-                  : formatCurrency(result.holdings.partner.monthlyNetDividendUSD, 'USD')}
+                  ? formatCurrency(result.holdings.income.monthlyNetDividendKRW, 'KRW')
+                  : formatCurrency(result.holdings.income.monthlyNetDividendUSD, 'USD')}
               </strong>
             </div>
           </div>

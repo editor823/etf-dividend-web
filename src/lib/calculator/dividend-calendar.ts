@@ -64,48 +64,25 @@ interface TickerDividendSchedule {
   isEstimated: boolean;
 }
 
-export const TICKER_SCHEDULES: Record<string, TickerDividendSchedule> = {
-  SCHD: {
-    name: 'Schwab U.S. Dividend Equity',
-    frequency: 'quarterly',
-    payMonths: [3, 6, 9, 12],
-    dayLabel: '말일경 (25~30일)',
-    dpsPerPayment: 0.718, // 분기당 주당 ~$0.718 (연간 약 $2.87)
-    isEstimated: false,
-  },
-  JEPI: {
-    name: 'JPMorgan Equity Premium Income',
-    frequency: 'monthly',
-    payMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-    dayLabel: '월초 (1~7일)',
-    dpsPerPayment: 0.355, // 월당 주당 ~$0.355 (연간 약 $4.26)
-    isEstimated: true,
-  },
-  JEPQ: {
-    name: 'JPMorgan Nasdaq Premium Income',
-    frequency: 'monthly',
-    payMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-    dayLabel: '월초 (1~7일)',
-    dpsPerPayment: 0.423, // 월당 주당 ~$0.423 (연간 약 $5.07)
-    isEstimated: true,
-  },
-  VOO: {
-    name: 'Vanguard S&P 500 ETF',
-    frequency: 'quarterly',
-    payMonths: [3, 6, 9, 12],
-    dayLabel: '말일경 (25~30일)',
-    dpsPerPayment: 1.765, // 분기당 주당 ~$1.765 (연간 약 $7.06)
-    isEstimated: false,
-  },
-  DIVO: {
-    name: 'Amplify C-PACE ETF',
-    frequency: 'monthly',
-    payMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-    dayLabel: '말일경 (28~31일)',
-    dpsPerPayment: 0.158, // 월당 주당 ~$0.158
-    isEstimated: true,
-  },
-};
+import { ETF_DATABASE } from '@/lib/data/etf-database';
+
+export const TICKER_SCHEDULES: Record<string, TickerDividendSchedule> = Object.fromEntries(
+  Object.values(ETF_DATABASE).map((etf) => {
+    const annualDps = etf.currentPrice * etf.dividendYield;
+    const paymentsCount = etf.frequency === 'monthly' ? 12 : 4;
+    return [
+      etf.ticker,
+      {
+        name: etf.nameKo ? `${etf.nameKo} (${etf.ticker})` : etf.name,
+        frequency: etf.frequency,
+        payMonths: etf.payMonths,
+        dayLabel: etf.payMonthsLabel,
+        dpsPerPayment: Number((annualDps / paymentsCount).toFixed(3)),
+        isEstimated: etf.frequency === 'monthly',
+      },
+    ];
+  })
+);
 
 /**
  * 추천 포트폴리오 프리셋
