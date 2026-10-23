@@ -162,6 +162,37 @@ export default function Home() {
         onOpenGuideModal={() => setIsGuideModalOpen(true)}
       />
 
+      {/* 6대 계산기 초간단 활용 가이드 1줄 알림 배너 (헤더 바로 아래) */}
+      <div className="w-full bg-gradient-to-r from-amber-500/10 via-amber-400/10 to-income/10 border-b border-amber-300/40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2.5 text-center sm:text-left">
+            <span className="w-7 h-7 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-2xs">
+              <Lightbulb className="w-4 h-4" />
+            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-extrabold text-sm text-brand-primary">
+                처음 방문하셨나요? 6대 계산기 200% 활용 가이드
+              </span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300/60">
+                초보자 필수
+              </span>
+              <span className="text-xs text-brand-muted hidden md:inline">
+                내 투자 상황에 딱 맞는 계산기 선택 기준과 실전 꿀팁을 확인하세요.
+              </span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsGuideModalOpen(true)}
+            className="w-full sm:w-auto px-4 py-1.5 rounded-xl bg-brand-primary hover:bg-brand-dark text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 shrink-0 group cursor-pointer"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <span>활용 가이드 열기</span>
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+        </div>
+      </div>
+
       {/* 메인 히어로 섹션 */}
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-14 space-y-16">
         <div className="text-center max-w-3xl mx-auto space-y-5">
@@ -207,118 +238,8 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 인터랙티브 탭 & 툴 섹션 */}
-        <section id="interactive-tools" className="scroll-mt-24 space-y-6">
-          {/* 6대 계산기 초간단 활용 가이드 알림 배너 */}
-          <div className="max-w-4xl mx-auto bg-gradient-to-r from-amber-500/10 via-amber-400/10 to-income/10 border border-amber-300/40 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
-            <div className="flex items-center gap-3.5 text-center sm:text-left">
-              <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs">
-                <Lightbulb className="w-5 h-5" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2 justify-center sm:justify-start">
-                  <span className="font-extrabold text-sm sm:text-base text-brand-primary">
-                    처음 방문하셨나요? 6대 계산기 200% 활용 가이드
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300/50">
-                    초보자 필수
-                  </span>
-                </div>
-                <p className="text-xs text-brand-muted mt-0.5">
-                  내 투자 상황에 딱 맞는 계산기 선택 기준과 실전 꿀팁을 팝업으로 쉽고 빠르게 확인하세요.
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => setIsGuideModalOpen(true)}
-              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-brand-primary hover:bg-brand-dark text-white text-xs font-bold transition-all shadow-sm flex items-center justify-center gap-1.5 shrink-0 group cursor-pointer"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>활용 가이드 열기</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-            </button>
-          </div>
-
-          {/* 상단 탭 네비게이션 */}
-          <div className="flex justify-center">
-            <div className="inline-flex flex-wrap justify-center p-1.5 bg-brand-secondary/70 rounded-2xl border border-subtle-border shadow-xs gap-1">
-              <button
-                type="button"
-                onClick={() => setActiveTab('reverse')}
-                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
-                  activeTab === 'reverse'
-                    ? 'bg-brand-primary text-white shadow-md'
-                    : 'text-brand-primary/70 hover:text-brand-primary'
-                }`}
-              >
-                <DollarSign className="w-4 h-4 text-income" />
-                <span>1. 역산기</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('compare')}
-                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
-                  activeTab === 'compare'
-                    ? 'bg-brand-primary text-white shadow-md'
-                    : 'text-brand-primary/70 hover:text-brand-primary'
-                }`}
-              >
-                <Scale className="w-4 h-4 text-income" />
-                <span>2. 1:1 맞짱</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('timemachine')}
-                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
-                  activeTab === 'timemachine'
-                    ? 'bg-brand-primary text-white shadow-md'
-                    : 'text-brand-primary/70 hover:text-brand-primary'
-                }`}
-              >
-                <History className="w-4 h-4 text-income" />
-                <span>3. 타임머신</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('barbell')}
-                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
-                  activeTab === 'barbell'
-                    ? 'bg-brand-primary text-white shadow-md'
-                    : 'text-brand-primary/70 hover:text-brand-primary'
-                }`}
-              >
-                <PieChart className="w-4 h-4 text-income" />
-                <span>4. 바벨 포트폴리오</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('drip')}
-                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
-                  activeTab === 'drip'
-                    ? 'bg-brand-primary text-white shadow-md'
-                    : 'text-brand-primary/70 hover:text-brand-primary'
-                }`}
-              >
-                <Repeat className="w-4 h-4 text-income" />
-                <span>5. DRIP 복리</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('calendar')}
-                className={`flex items-center gap-1.5 px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all ${
-                  activeTab === 'calendar'
-                    ? 'bg-brand-primary text-white shadow-md'
-                    : 'text-brand-primary/70 hover:text-brand-primary'
-                }`}
-              >
-                <Calendar className="w-4 h-4 text-income" />
-                <span>6. 배당 캘린더</span>
-              </button>
-            </div>
-          </div>
-
-          {/* 선택된 탭 컴포넌트 렌더링 */}
+        {/* 인터랙티브 탭 & 툴 섹션 (상단 스티키 헤더 탭과 일원화되어 중복 탭 박스 없이 전용 뷰 직접 표시) */}
+        <section id="interactive-tools" className="scroll-mt-28">
           <div>
             {activeTab === 'reverse' && <TargetDividendCalculator />}
             {activeTab === 'compare' && <EtfComparison />}

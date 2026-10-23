@@ -50,17 +50,18 @@ export default function Header({
   const isGuides = pathname.startsWith('/guides');
   const isAbout = pathname === '/about';
 
-  const tabList: { id: CalculatorTab; label: string }[] = [
-    { id: 'reverse', label: '역산기' },
-    { id: 'compare', label: '맞짱' },
-    { id: 'timemachine', label: '타임머신' },
-    { id: 'barbell', label: '바벨' },
-    { id: 'drip', label: 'DRIP' },
-    { id: 'calendar', label: '캘린더' },
+  const tabList: { id: CalculatorTab; label: string; icon: string }[] = [
+    { id: 'reverse', label: '1. 역산기', icon: '🎯' },
+    { id: 'compare', label: '2. 1:1 맞짱', icon: '⚔️' },
+    { id: 'timemachine', label: '3. 타임머신', icon: '📈' },
+    { id: 'barbell', label: '4. 바벨 포트폴리오', icon: '⚖️' },
+    { id: 'drip', label: '5. DRIP 복리', icon: '❄️' },
+    { id: 'calendar', label: '6. 배당 캘린더', icon: '📅' },
   ];
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-white/90 border-b border-subtle-border transition-all">
+    <header className="sticky top-0 z-50 backdrop-blur-md bg-white/95 border-b border-subtle-border transition-all">
+      {/* 1. 최상단 메인 헤더 바 (h-16) */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* 좌측 로고 (클릭 시 메인 홈 / 이동) */}
         <Link
@@ -81,29 +82,9 @@ export default function Header({
           </div>
         </Link>
 
-        {/* 데스크톱 중앙/우측 네비게이션 */}
+        {/* 데스크톱 우측 네비게이션 */}
         <div className="hidden lg:flex items-center gap-2">
-          {/* 홈 페이지에 있고 onTabSelect가 있을 때: 6대 계산기 퀵 탭 */}
-          {isHome && onTabSelect && (
-            <div className="flex items-center gap-1 bg-brand-secondary/40 p-1 rounded-xl mr-1 border border-subtle-border/60">
-              {tabList.map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => onTabSelect(tab.id)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-brand-primary text-white shadow-xs'
-                      : 'text-brand-primary hover:bg-brand-secondary'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* 주요 글로벌 링크 (계산기 대시보드 / 투자 가이드 / 사이트 소개) */}
+          {/* 주요 글로벌 링크 (계산기 대시보드 / 투자 가이드 / 사이트 소개 / 랭킹) */}
           <nav className="flex items-center gap-1.5">
             {!isHome && (
               <Link
@@ -171,7 +152,7 @@ export default function Header({
             <button
               type="button"
               onClick={onOpenSaveModal}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-secondary hover:bg-brand-secondaryHover text-brand-primary text-xs font-bold transition-all shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-secondary hover:bg-brand-secondaryHover text-brand-primary text-xs font-bold transition-all shadow-2xs cursor-pointer"
             >
               <Bookmark className="w-3.5 h-3.5 text-income" />
               <span>포트폴리오 저장</span>
@@ -191,7 +172,7 @@ export default function Header({
                 type="button"
                 onClick={() => signOut()}
                 title="로그아웃"
-                className="p-1.5 rounded-lg text-brand-muted hover:text-alert transition-colors"
+                className="p-1.5 rounded-lg text-brand-muted hover:text-alert transition-colors cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -201,7 +182,7 @@ export default function Header({
               <button
                 type="button"
                 onClick={onOpenSaveModal}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-brand-primary hover:bg-brand-dark text-white text-xs font-bold transition-all shadow-sm"
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-brand-primary hover:bg-brand-dark text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
               >
                 <User className="w-3.5 h-3.5" />
                 <span>로그인</span>
@@ -214,7 +195,7 @@ export default function Header({
             <button
               type="button"
               onClick={onOpenAdminModal}
-              className="p-1.5 rounded-xl text-brand-muted hover:text-brand-primary hover:bg-brand-secondary transition-colors ml-0.5"
+              className="p-1.5 rounded-xl text-brand-muted hover:text-brand-primary hover:bg-brand-secondary transition-colors ml-0.5 cursor-pointer"
               title="시스템 관리자 모드"
             >
               <Lock className="w-3.5 h-3.5" />
@@ -247,7 +228,7 @@ export default function Header({
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl text-brand-primary hover:bg-brand-secondary transition-colors ml-1"
+            className="p-2 rounded-xl text-brand-primary hover:bg-brand-secondary transition-colors ml-1 cursor-pointer"
             aria-label="메뉴 열기"
           >
             {mobileMenuOpen ? (
@@ -259,7 +240,35 @@ export default function Header({
         </div>
       </div>
 
-      {/* 모바일 드롭다운 메뉴 (반응형 햄버거 메뉴) */}
+      {/* 2. 6대 계산기 완전 일원화 네비게이션 탭 바 (홈 화면 스티키 탭) */}
+      {isHome && onTabSelect && (
+        <div className="border-t border-subtle-border/80 bg-white/95 backdrop-blur-md shadow-2xs">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-start md:justify-center gap-1.5 py-2 overflow-x-auto no-scrollbar">
+              {tabList.map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => onTabSelect(tab.id)}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all whitespace-nowrap cursor-pointer shrink-0 ${
+                      isActive
+                        ? 'bg-brand-primary text-white shadow-sm ring-2 ring-income/40 scale-102'
+                        : 'text-brand-primary/70 hover:text-brand-primary hover:bg-brand-secondary/70'
+                    }`}
+                  >
+                    <span className="text-sm">{tab.icon}</span>
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3. 모바일 드롭다운 메뉴 (반응형 햄버거 메뉴) */}
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-subtle-border bg-white px-4 pt-3 pb-6 shadow-xl animate-in slide-in-from-top-2 duration-200">
           <div className="space-y-2">
@@ -293,7 +302,7 @@ export default function Header({
                 <span>투자 가이드 리포트</span>
               </span>
               <span className="text-[10px] bg-income text-white px-2 py-0.5 rounded-full font-mono">
-                3개 아티클
+                신규 칼럼
               </span>
             </Link>
 
@@ -334,7 +343,7 @@ export default function Header({
                   onOpenGuideModal();
                   setMobileMenuOpen(false);
                 }}
-                className="w-full flex items-center justify-between p-3 rounded-xl text-xs font-bold bg-amber-50 border border-amber-200/80 text-amber-900 hover:bg-amber-100/80 transition-colors shadow-2xs"
+                className="w-full flex items-center justify-between p-3 rounded-xl text-xs font-bold bg-amber-50 border border-amber-200/80 text-amber-900 hover:bg-amber-100/80 transition-colors shadow-2xs cursor-pointer"
               >
                 <span className="flex items-center gap-2">
                   <Lightbulb className="w-4 h-4 text-amber-600" />
@@ -346,12 +355,12 @@ export default function Header({
               </button>
             )}
 
-            {/* 6대 핵심 배당 계산기 바로가기 (어느 페이지에서든 접근 가능) */}
+            {/* 6대 핵심 배당 계산기 바로가기 */}
             <div className="pt-2">
               <span className="text-[10px] text-brand-muted font-mono uppercase tracking-wider px-1 block mb-1.5">
-                핵심 배당 계산기 바로가기
+                핵심 배당 계산기 탭 전환
               </span>
-              <div className="grid grid-cols-3 gap-1.5">
+              <div className="grid grid-cols-2 gap-1.5">
                 {tabList.map((tab) => {
                   if (isHome && onTabSelect) {
                     return (
@@ -362,13 +371,14 @@ export default function Header({
                           onTabSelect(tab.id);
                           setMobileMenuOpen(false);
                         }}
-                        className={`p-2 rounded-lg text-xs font-bold text-center border transition-all ${
+                        className={`p-2.5 rounded-xl text-xs font-bold text-left border flex items-center gap-1.5 transition-all ${
                           activeTab === tab.id
-                            ? 'bg-income text-white border-income shadow-xs'
+                            ? 'bg-brand-primary text-white border-brand-primary shadow-xs'
                             : 'bg-white border-subtle-border text-brand-primary hover:bg-brand-secondary'
                         }`}
                       >
-                        {tab.label}
+                        <span>{tab.icon}</span>
+                        <span>{tab.label}</span>
                       </button>
                     );
                   }
@@ -377,9 +387,10 @@ export default function Header({
                       key={tab.id}
                       href={`/?tab=${tab.id}#interactive-tools`}
                       onClick={() => setMobileMenuOpen(false)}
-                      className="p-2 rounded-lg text-xs font-bold text-center border bg-white border-subtle-border text-brand-primary hover:bg-brand-secondary transition-colors"
+                      className="p-2.5 rounded-xl text-xs font-bold text-left border bg-white border-subtle-border text-brand-primary hover:bg-brand-secondary flex items-center gap-1.5 transition-colors"
                     >
-                      {tab.label}
+                      <span>{tab.icon}</span>
+                      <span>{tab.label}</span>
                     </Link>
                   );
                 })}
@@ -428,9 +439,10 @@ export default function Header({
                     setMobileMenuOpen(false);
                   }}
                   className="flex items-center gap-1 text-xs text-brand-muted hover:text-brand-primary font-mono"
+                  title="관리자 모드"
                 >
                   <Lock className="w-3.5 h-3.5" />
-                  <span>관리자</span>
+                  <span>Admin</span>
                 </button>
               )}
             </div>
