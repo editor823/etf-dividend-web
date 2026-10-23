@@ -19,6 +19,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
+      url: `${BASE_URL}/encyclopedia`,
+      lastModified: '2026-03-25',
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
       url: `${BASE_URL}/guides`,
       lastModified: '2026-03-25',
       changeFrequency: 'weekly',

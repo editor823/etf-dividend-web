@@ -50,6 +50,7 @@ export default function Header({
   const isGuides = pathname.startsWith('/guides');
   const isAbout = pathname === '/about';
   const isRankings = pathname === '/rankings';
+  const isEncyclopedia = pathname.startsWith('/encyclopedia') || pathname.startsWith('/dictionary');
 
   const tabList: { id: CalculatorTab; label: string; icon: string }[] = [
     { id: 'reverse', label: '1. 역산기', icon: '🎯' },
@@ -85,7 +86,7 @@ export default function Header({
 
         {/* 데스크톱 우측 네비게이션 */}
         <div className="hidden lg:flex items-center gap-2">
-          {/* 주요 글로벌 링크 (계산기 대시보드 / 투자 가이드 / 사이트 소개 / 랭킹) */}
+          {/* 주요 글로벌 링크 (계산기 대시보드 / 투자 가이드 / ETF 백과사전 / 사이트 소개 / 랭킹) */}
           <nav className="flex items-center gap-1.5">
             {!isHome && (
               <Link
@@ -98,18 +99,29 @@ export default function Header({
             )}
 
             <Link
+              href="/encyclopedia"
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                isEncyclopedia
+                  ? 'bg-income text-white font-extrabold shadow-2xs'
+                  : 'text-brand-primary hover:bg-brand-secondary hover:text-income'
+              }`}
+            >
+              <BookOpen className={`w-3.5 h-3.5 ${isEncyclopedia ? 'text-white' : 'text-income'}`} />
+              <span>ETF 백과사전</span>
+              <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${isEncyclopedia ? 'bg-white/20 text-white' : 'bg-income text-white'}`}>
+                20선
+              </span>
+            </Link>
+
+            <Link
               href="/guides"
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                 isGuides
                   ? 'bg-income-light text-income font-extrabold ring-1 ring-income/30'
-                  : 'text-income hover:bg-income-light/60'
+                  : 'text-brand-muted hover:text-brand-primary hover:bg-brand-secondary'
               }`}
             >
-              <BookOpen className="w-3.5 h-3.5" />
               <span>투자 가이드</span>
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-income text-white font-mono">
-                신규
-              </span>
             </Link>
 
             <Link
@@ -308,6 +320,24 @@ export default function Header({
               </span>
               <span className="text-[10px] bg-income text-white px-2 py-0.5 rounded-full font-mono">
                 신규 칼럼
+              </span>
+            </Link>
+
+            <Link
+              href="/encyclopedia"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex items-center justify-between p-3 rounded-xl text-xs font-bold transition-colors ${
+                isEncyclopedia
+                  ? 'bg-income text-white shadow-xs'
+                  : 'bg-income-light/40 border border-income/30 text-income hover:bg-income-light/70'
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                <span>📖 미국 배당 ETF 20선 백과사전</span>
+              </span>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono ${isEncyclopedia ? 'bg-white/20 text-white' : 'bg-income text-white'}`}>
+                20종 심층해설
               </span>
             </Link>
 

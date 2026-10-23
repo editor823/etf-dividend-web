@@ -229,6 +229,12 @@ export default function Home() {
               📅 12개월 배당 캘린더
             </span>
             <Link
+              href="/encyclopedia"
+              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-income/40 shadow-2xs font-extrabold text-income flex items-center gap-1.5 hover:scale-105 transition-all"
+            >
+              📖 미국 배당 ETF 20선 백과사전
+            </Link>
+            <Link
               href="/rankings"
               className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-300/80 shadow-2xs font-extrabold text-amber-900 flex items-center gap-1.5 hover:scale-105 transition-all"
             >
